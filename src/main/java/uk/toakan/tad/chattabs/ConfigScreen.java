@@ -92,6 +92,7 @@ public final class ConfigScreen {
                         case FREE -> "chat-tabs.config.general.bar_position.free";
                     })))
                 .build())
+            .option(toggle("chat-tabs.config.general.lock_bar", d.lockBar, () -> c.lockBar, v -> c.lockBar = v))
             .option(button("chat-tabs.config.general.reset_free", parent, GENERAL_CATEGORY, () -> {
                     c.freeX = 0;
                     c.freeY = Config.FREE_Y_DEFAULT;

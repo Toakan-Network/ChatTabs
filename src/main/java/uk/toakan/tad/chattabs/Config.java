@@ -17,6 +17,8 @@ public final class Config {
     /** Free bar position: offset of its top-left corner from the chat's top-left corner. */
     public int freeX = 0;
     public int freeY = FREE_Y_DEFAULT;
+    /** A Free bar stays where it is: a press only opens a tab, it never drags the bar. */
+    public boolean lockBar = false;
     public List<TabConfig> tabs = defaultTabs();
 
     /** Free position's default: just above the chat. */

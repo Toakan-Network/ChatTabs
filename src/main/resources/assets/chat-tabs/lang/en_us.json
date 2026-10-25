@@ -24,6 +24,8 @@
   "chat-tabs.config.general.bar_position.top": "Top",
   "chat-tabs.config.general.bar_position.bottom": "Bottom",
   "chat-tabs.config.general.bar_position.free": "Free",
+  "chat-tabs.config.general.lock_bar": "Lock tab bar",
+  "chat-tabs.config.general.lock_bar.desc": "Keep a Free tab bar where it is: clicking a tab only opens it, so the bar can't be dragged by accident. Turn off to move it again.",
   "chat-tabs.config.general.reset_free": "Reset free position",
   "chat-tabs.config.general.reset_free.button": "Reset",
   "chat-tabs.config.general.reset_free.desc": "Puts a Free tab bar back just above the chat.",

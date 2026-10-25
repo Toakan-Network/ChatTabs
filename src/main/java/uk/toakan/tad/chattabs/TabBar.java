@@ -160,10 +160,10 @@ final class TabBar {
         if (event.button() == ChatTabsClient.inputCode("MOUSE_BUTTON_RIGHT")) {
             ChatTabs.close(tab);
         } else if (event.button() == ChatTabsClient.inputCode("MOUSE_BUTTON_LEFT")) {
-            if (ChatTabs.config().barPosition != Config.BarPosition.FREE) {
+            if (ChatTabs.config().barPosition != Config.BarPosition.FREE || ChatTabs.config().lockBar) {
                 ChatTabs.select(tab);
             } else {
-                // Free: a drag moves the bar, a press without one selects on release.
+                // Free and unlocked: a drag moves the bar, a press without one selects on release.
                 pressed = true;
                 dragging = false;
                 pressedTab = tab;

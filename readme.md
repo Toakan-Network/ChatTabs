@@ -40,7 +40,8 @@ moves or scales the chat. Pick where in Settings > General > Tab bar:
 - **Top:** above the chat.
 - **Free:** drag the tabs (left click and move) to any spot. They snap to the chat's edges and centre and to the
   screen edges, and keep their place next to the chat when the chat moves. A click without moving still opens a
-  tab. Reset free position puts the bar back just above the chat.
+  tab. Reset free position puts the bar back just above the chat. Once it's where you want it, turn on
+  Settings > General > Lock tab bar so a click can't drag it by accident.
 
 The tab bar also stays on screen while chat is closed, in the same spot, so you can see unread counts while you
 play. Open chat to click a tab. Turn it off with Settings > General > Tabs while chat is closed.
@@ -55,7 +56,7 @@ A tab you aren't looking at shows how many new messages it has, e.g. `Guild (3)`
 
 ## Settings
 - **General:** turn tabs on or off, DM tabs and their limit, unread counts, tabs while chat is closed, tab bar
-  position.
+  position and lock.
 - **Tabs:** one section per tab: name, which channels it shows, where typing sends, move left or right, delete.
   Add tab and Reset tabs at the bottom. These buttons save at once, along with anything else you changed.
 - **Appearance:** colours (background, border and text for normal, hovered, open and unread tabs), tab height,

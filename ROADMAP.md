@@ -18,6 +18,7 @@
 - 0.2.3: the tab bar shows on the HUD while chat is closed (Settings > General > Tabs while chat is closed, on by
   default): a Fabric HUD layer after vanilla's chat. `ChatFrame` now records closed chat too and always uses the
   open chat's height, so the bar doesn't move when chat opens.
+- 0.2.5: Lock tab bar (Settings > General, off by default): a locked Free bar only opens tabs, never drags.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs
