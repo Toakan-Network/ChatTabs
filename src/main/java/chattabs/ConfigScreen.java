@@ -21,6 +21,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
@@ -71,31 +72,25 @@ public final class ConfigScreen {
         Config c = ChatTabs.config();
         Config d = new Config();
         return ConfigCategory.createBuilder()
-            .name(Component.literal("General"))
-            .option(toggle("Chat tabs", "Show the tab bar and filter chat by tab. Only on Hypixel; other servers "
-                + "always get normal chat.", d.enabled, () -> c.enabled, v -> c.enabled = v))
-            .option(toggle("DM tabs", "Open a tab for each player you message or who messages you. Right click a "
-                + "DM tab to close it.", d.whisperTabs, () -> c.whisperTabs, v -> c.whisperTabs = v))
-            .option(slider("Most DM tabs", "How many DM tabs can be open; a new conversation closes the oldest.",
-                1, 20, d.maxWhisperTabs, () -> c.maxWhisperTabs, v -> c.maxWhisperTabs = v))
-            .option(toggle("Unread counts", "Show how many new messages a tab has, e.g. Guild (3).",
-                d.showUnread, () -> c.showUnread, v -> c.showUnread = v))
+            .name(Component.translatable("chat-tabs.config.general"))
+            .option(toggle("chat-tabs.config.general.enabled", d.enabled, () -> c.enabled, v -> c.enabled = v))
+            .option(toggle("chat-tabs.config.general.dm_tabs", d.whisperTabs, () -> c.whisperTabs,
+                v -> c.whisperTabs = v))
+            .option(slider("chat-tabs.config.general.max_dm_tabs", 1, 20, d.maxWhisperTabs, () -> c.maxWhisperTabs,
+                v -> c.maxWhisperTabs = v))
+            .option(toggle("chat-tabs.config.general.unread", d.showUnread, () -> c.showUnread, v -> c.showUnread = v))
             .option(Option.<Config.BarPosition>createBuilder()
-                .name(Component.literal("Tab bar"))
-                .description(OptionDescription.of(Component.literal(
-                    "Top: above the chat. Bottom: under the chat. Free: drag the tabs in chat to place them; they "
-                        + "snap to the chat's edges and keep their place next to it when the chat moves (e.g. with "
-                        + "Huddable).")))
+                .name(Component.translatable("chat-tabs.config.general.bar_position"))
+                .description(OptionDescription.of(Component.translatable("chat-tabs.config.general.bar_position.desc")))
                 .binding(d.barPosition, () -> c.barPosition, v -> c.barPosition = v)
                 .controller(opt -> EnumControllerBuilder.create(opt).enumClass(Config.BarPosition.class)
-                    .formatValue(p -> Component.literal(switch (p) {
-                        case TOP -> "Top";
-                        case BOTTOM -> "Bottom";
-                        case FREE -> "Free";
+                    .formatValue(p -> Component.translatable(switch (p) {
+                        case TOP -> "chat-tabs.config.general.bar_position.top";
+                        case BOTTOM -> "chat-tabs.config.general.bar_position.bottom";
+                        case FREE -> "chat-tabs.config.general.bar_position.free";
                     })))
                 .build())
-            .option(button("Reset free position", "Reset", "Puts a Free tab bar back just above the chat.",
-                parent, GENERAL_CATEGORY, () -> {
+            .option(button("chat-tabs.config.general.reset_free", parent, GENERAL_CATEGORY, () -> {
                     c.freeX = 0;
                     c.freeY = Config.FREE_Y_DEFAULT;
                     return -1;
@@ -108,8 +103,8 @@ public final class ConfigScreen {
         int open = expandedTab;
         expandedTab = -1;
         ConfigCategory.Builder category = ConfigCategory.createBuilder()
-            .name(Component.literal("Tabs"))
-            .tooltip(Component.literal("The tabs in the bar, left to right. DM tabs open on their own after these."));
+            .name(Component.translatable("chat-tabs.config.tabs"))
+            .tooltip(Component.translatable("chat-tabs.config.tabs.desc"));
         for (int i = 0; i < tabs.size(); i++) {
             Config.TabConfig tab = tabs.get(i);
             int index = i;
@@ -117,15 +112,15 @@ public final class ConfigScreen {
                 .name(Component.literal(tab.name))
                 .collapsed(i != open)
                 .option(Option.<String>createBuilder()
-                    .name(Component.literal("Name"))
-                    .description(OptionDescription.of(Component.literal("Shown on the tab.")))
+                    .name(Component.translatable("chat-tabs.config.tabs.name"))
+                    .description(OptionDescription.of(Component.translatable("chat-tabs.config.tabs.name.desc")))
                     .binding("Tab", () -> tab.name, v -> tab.name = v)
                     .controller(StringControllerBuilder::create)
                     .build());
             for (Channel channel : Channel.values()) {
                 group.option(Option.<Boolean>createBuilder()
-                    .name(Component.literal("Show " + channel.label))
-                    .description(OptionDescription.of(Component.literal(showDescription(channel))))
+                    .name(Component.translatable("chat-tabs.config.tabs.show", channel.label()))
+                    .description(OptionDescription.of(Component.translatable(showDescription(channel))))
                     .binding(false, () -> tab.channels.contains(channel), v -> {
                         if (!v) tab.channels.remove(channel);
                         else if (!tab.channels.contains(channel)) tab.channels.add(channel);
@@ -134,41 +129,39 @@ public final class ConfigScreen {
                     .build());
             }
             group.option(Option.<Channel>createBuilder()
-                    .name(Component.literal("Send to"))
-                    .description(OptionDescription.of(Component.literal(
-                        "Where chat typed in this tab goes. Commands you type (starting with /) are sent as they are.")))
+                    .name(Component.translatable("chat-tabs.config.tabs.send_to"))
+                    .description(OptionDescription.of(Component.translatable("chat-tabs.config.tabs.send_to.desc")))
                     .binding(Channel.EVERYTHING, () -> SEND_TO.contains(tab.sendTo) ? tab.sendTo : Channel.EVERYTHING,
                         v -> tab.sendTo = v)
                     .controller(opt -> CyclingListControllerBuilder.create(opt).values(SEND_TO)
-                        .formatValue(c -> Component.literal(c.command == null ? "Normal chat" : c.label + " (/" + c.command + ")")))
+                        .formatValue(c -> c.command == null
+                            ? Component.translatable("chat-tabs.config.tabs.send_to.normal")
+                            : Component.translatable("chat-tabs.config.tabs.send_to.channel", c.label(), c.command)))
                     .build())
-                .option(button("Move left", "Move", "Moves this tab one place to the left.", parent, TABS_CATEGORY, () -> {
+                .option(button("chat-tabs.config.tabs.move_left", parent, TABS_CATEGORY, () -> {
                     if (index == 0) return index;
                     Collections.swap(tabs, index, index - 1);
                     return index - 1;
                 }))
-                .option(button("Move right", "Move", "Moves this tab one place to the right.", parent, TABS_CATEGORY, () -> {
+                .option(button("chat-tabs.config.tabs.move_right", parent, TABS_CATEGORY, () -> {
                     if (index == tabs.size() - 1) return index;
                     Collections.swap(tabs, index, index + 1);
                     return index + 1;
                 }))
-                .option(button("Delete tab", "Delete", "Removes this tab. The last tab can't be deleted.", parent,
-                    TABS_CATEGORY, () -> {
+                .option(button("chat-tabs.config.tabs.delete", parent, TABS_CATEGORY, () -> {
                         if (tabs.size() > 1) tabs.remove(index);
                         return -1;
                     }));
             category.group(group.build());
         }
         category.group(OptionGroup.createBuilder()
-            .name(Component.literal("New tab"))
-            .option(button("Add tab", "Add", "Adds a tab showing every message, at the right end.", parent,
-                TABS_CATEGORY, () -> {
+            .name(Component.translatable("chat-tabs.config.tabs.new"))
+            .option(button("chat-tabs.config.tabs.add", parent, TABS_CATEGORY, () -> {
                     tabs.add(new Config.TabConfig("Tab " + (tabs.size() + 1), List.of(Channel.EVERYTHING),
                         Channel.EVERYTHING));
                     return tabs.size() - 1;
                 }))
-            .option(button("Reset tabs", "Reset", "Puts back the default tabs: General, All, Guild, Party, DMs and "
-                + "System.", parent, TABS_CATEGORY, () -> {
+            .option(button("chat-tabs.config.tabs.reset", parent, TABS_CATEGORY, () -> {
                     tabs.clear();
                     tabs.addAll(Config.defaultTabs());
                     return -1;
@@ -177,16 +170,17 @@ public final class ConfigScreen {
         return category.build();
     }
 
+    /** The lang key of a channel's Show option description. */
     private static String showDescription(Channel channel) {
         return switch (channel) {
-            case ALL_CHAT -> "Public chat from players (\"[598] [MVP+] Name: ...\").";
-            case GUILD -> "Lines starting with \"Guild >\".";
-            case OFFICER -> "Lines starting with \"Officer >\".";
-            case PARTY -> "Lines starting with \"Party >\".";
-            case COOP -> "Lines starting with \"Co-op >\" (SkyBlock co-op chat).";
-            case DM -> "Messages from and to players (\"From ...\" and \"To ...\").";
-            case SYSTEM -> "Everything that isn't one of the channels above: NPCs, server and game messages.";
-            case EVERYTHING -> "Every message.";
+            case ALL_CHAT -> "chat-tabs.config.tabs.show.all_chat.desc";
+            case GUILD -> "chat-tabs.config.tabs.show.guild.desc";
+            case OFFICER -> "chat-tabs.config.tabs.show.officer.desc";
+            case PARTY -> "chat-tabs.config.tabs.show.party.desc";
+            case COOP -> "chat-tabs.config.tabs.show.coop.desc";
+            case DM -> "chat-tabs.config.tabs.show.dm.desc";
+            case SYSTEM -> "chat-tabs.config.tabs.show.system.desc";
+            case EVERYTHING -> "chat-tabs.config.tabs.show.everything.desc";
         };
     }
 
@@ -197,46 +191,52 @@ public final class ConfigScreen {
         // The preview draws a copy that follows every unsaved change; the real look only changes on Save.
         Look look = new Look(TabStyle.copy());
         return ConfigCategory.createBuilder()
-            .name(Component.literal("Appearance"))
+            .name(Component.translatable("chat-tabs.config.appearance"))
             .group(OptionGroup.createBuilder()
-                .name(Component.literal("Colours"))
-                .option(look.colour("Tab background", d.tabBackground, st -> st.tabBackground, (st, v) -> st.tabBackground = v))
-                .option(look.colour("Tab border", d.tabBorder, st -> st.tabBorder, (st, v) -> st.tabBorder = v))
-                .option(look.colour("Tab text", d.tabText, st -> st.tabText, (st, v) -> st.tabText = v))
-                .option(look.colour("Hovered tab background", d.hoverBackground, st -> st.hoverBackground,
-                    (st, v) -> st.hoverBackground = v))
-                .option(look.colour("Open tab background", d.activeBackground, st -> st.activeBackground,
-                    (st, v) -> st.activeBackground = v))
-                .option(look.colour("Open tab border", d.activeBorder, st -> st.activeBorder, (st, v) -> st.activeBorder = v))
-                .option(look.colour("Open tab text", d.activeText, st -> st.activeText, (st, v) -> st.activeText = v))
-                .option(look.colour("Unread tab text", d.unreadText, st -> st.unreadText, (st, v) -> st.unreadText = v))
+                .name(Component.translatable("chat-tabs.config.appearance.colours"))
+                .option(look.colour("chat-tabs.config.appearance.tab_background", d.tabBackground,
+                    st -> st.tabBackground, (st, v) -> st.tabBackground = v))
+                .option(look.colour("chat-tabs.config.appearance.tab_border", d.tabBorder, st -> st.tabBorder,
+                    (st, v) -> st.tabBorder = v))
+                .option(look.colour("chat-tabs.config.appearance.tab_text", d.tabText, st -> st.tabText,
+                    (st, v) -> st.tabText = v))
+                .option(look.colour("chat-tabs.config.appearance.hover_background", d.hoverBackground,
+                    st -> st.hoverBackground, (st, v) -> st.hoverBackground = v))
+                .option(look.colour("chat-tabs.config.appearance.active_background", d.activeBackground,
+                    st -> st.activeBackground, (st, v) -> st.activeBackground = v))
+                .option(look.colour("chat-tabs.config.appearance.active_border", d.activeBorder,
+                    st -> st.activeBorder, (st, v) -> st.activeBorder = v))
+                .option(look.colour("chat-tabs.config.appearance.active_text", d.activeText, st -> st.activeText,
+                    (st, v) -> st.activeText = v))
+                .option(look.colour("chat-tabs.config.appearance.unread_text", d.unreadText, st -> st.unreadText,
+                    (st, v) -> st.unreadText = v))
                 .build())
             .group(OptionGroup.createBuilder()
-                .name(Component.literal("Sizes"))
-                .option(look.slider("Tab height", "Height of the tabs in pixels.", 10, 20, d.tabHeight,
+                .name(Component.translatable("chat-tabs.config.appearance.sizes"))
+                .option(look.slider("chat-tabs.config.appearance.tab_height", 10, 20, d.tabHeight,
                     st -> st.tabHeight, (st, v) -> st.tabHeight = v))
-                .option(look.slider("Padding", "Space between a tab's border and its name.", 1, 12, d.padding,
+                .option(look.slider("chat-tabs.config.appearance.padding", 1, 12, d.padding,
                     st -> st.padding, (st, v) -> st.padding = v))
-                .option(look.slider("Gap", "Space between tabs.", 0, 8, d.gap, st -> st.gap, (st, v) -> st.gap = v))
-                .option(look.slider("Border width", "0 draws no border.", 0, 3, d.borderWidth,
+                .option(look.slider("chat-tabs.config.appearance.gap", 0, 8, d.gap, st -> st.gap,
+                    (st, v) -> st.gap = v))
+                .option(look.slider("chat-tabs.config.appearance.border_width", 0, 3, d.borderWidth,
                     st -> st.borderWidth, (st, v) -> st.borderWidth = v))
-                .option(look.slider("Corner radius", "0 draws square corners.", 0, 6, d.radius,
+                .option(look.slider("chat-tabs.config.appearance.radius", 0, 6, d.radius,
                     st -> st.radius, (st, v) -> st.radius = v))
                 .build())
             .group(OptionGroup.createBuilder()
-                .name(Component.literal("Text"))
+                .name(Component.translatable("chat-tabs.config.appearance.text"))
                 .option(look.finish(Option.<String>createBuilder()
-                        .name(Component.literal("Font"))
+                        .name(Component.translatable("chat-tabs.config.appearance.font"))
                         .controller(opt -> DropdownStringControllerBuilder.create(opt).values(fonts)),
-                    "Fonts from your resource packs. Unknown fonts fall back to Minecraft's.",
+                    Component.translatable("chat-tabs.config.appearance.font.desc"),
                     d.font, st -> st.font, (st, v) -> st.font = v))
-                .option(look.toggle("Text shadow", "Draw tab names with a shadow.", d.textShadow,
+                .option(look.toggle("chat-tabs.config.appearance.text_shadow", d.textShadow,
                     st -> st.textShadow, (st, v) -> st.textShadow = v))
-                .option(look.toggle("Bold open tab", "Draw the open tab's name in bold.", d.boldActive,
+                .option(look.toggle("chat-tabs.config.appearance.bold_active", d.boldActive,
                     st -> st.boldActive, (st, v) -> st.boldActive = v))
                 .build())
-            .option(button("Reset appearance", "Reset", "Puts every Appearance setting back to its default.",
-                parent, APPEARANCE_CATEGORY, () -> {
+            .option(button("chat-tabs.config.appearance.reset", parent, APPEARANCE_CATEGORY, () -> {
                     TabStyle.reset();
                     return -1;
                 }))
@@ -246,14 +246,14 @@ public final class ConfigScreen {
     /**
      * A button that changes the tab list or look. It keeps what is on screen (applies every unsaved option first, as
      * Save would), runs {@code action}, saves, and rebuilds the screen on {@code category}. The action returns the
-     * tab section to leave open, or -1.
+     * tab section to leave open, or -1. {@code key} is the name's lang key; the button text and the description
+     * are {@code key.button} and {@code key.desc}.
      */
-    private static ButtonOption button(String name, String text, String description, Screen parent, int category,
-                                       IntSupplier action) {
+    private static ButtonOption button(String key, Screen parent, int category, IntSupplier action) {
         return ButtonOption.createBuilder()
-            .name(Component.literal(name))
-            .text(Component.literal(text))
-            .description(OptionDescription.of(Component.literal(description)))
+            .name(Component.translatable(key))
+            .text(Component.translatable(key + ".button"))
+            .description(OptionDescription.of(Component.translatable(key + ".desc")))
             .action((screen, button) -> {
                 for (ConfigCategory c : screen.config.categories()) {
                     for (OptionGroup g : c.groups()) {
@@ -271,21 +271,22 @@ public final class ConfigScreen {
             .build();
     }
 
-    private static Option<Boolean> toggle(String name, String description, boolean def, Supplier<Boolean> getter,
-                                          Consumer<Boolean> setter) {
+    /** A switch named by lang key {@code key} and described by {@code key.desc}. */
+    private static Option<Boolean> toggle(String key, boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         return Option.<Boolean>createBuilder()
-            .name(Component.literal(name))
-            .description(OptionDescription.of(Component.literal(description)))
+            .name(Component.translatable(key))
+            .description(OptionDescription.of(Component.translatable(key + ".desc")))
             .binding(def, getter, setter)
             .controller(opt -> BooleanControllerBuilder.create(opt).onOffFormatter().coloured(true))
             .build();
     }
 
-    private static Option<Integer> slider(String name, String description, int min, int max, int def,
-                                          Supplier<Integer> getter, Consumer<Integer> setter) {
+    /** A slider named by lang key {@code key} and described by {@code key.desc}. */
+    private static Option<Integer> slider(String key, int min, int max, int def, Supplier<Integer> getter,
+                                          Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
-            .name(Component.literal(name))
-            .description(OptionDescription.of(Component.literal(description)))
+            .name(Component.translatable(key))
+            .description(OptionDescription.of(Component.translatable(key + ".desc")))
             .binding(def, getter, setter)
             .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(min, max).step(1))
             .build();
@@ -313,11 +314,11 @@ public final class ConfigScreen {
             };
         }
 
-        <T> Option<T> finish(Option.Builder<T> builder, String description, T def, Function<TabStyle, T> get,
+        <T> Option<T> finish(Option.Builder<T> builder, Component description, T def, Function<TabStyle, T> get,
                              BiConsumer<TabStyle, T> set) {
             TabStyle saved = TabStyle.get();
             return builder
-                .description(OptionDescription.createBuilder().text(Component.literal(description)).customImage(preview).build())
+                .description(OptionDescription.createBuilder().text(description).customImage(preview).build())
                 .binding(def, () -> get.apply(saved), v -> set.accept(saved, v))
                 .addListener((option, event) -> {
                     if (event == OptionEventListener.Event.STATE_CHANGE) set.accept(draft, option.pendingValue());
@@ -325,28 +326,29 @@ public final class ConfigScreen {
                 .build();
         }
 
-        Option<Color> colour(String name, int def, ToIntFunction<TabStyle> get, ObjIntConsumer<TabStyle> set) {
+        Option<Color> colour(String key, int def, ToIntFunction<TabStyle> get, ObjIntConsumer<TabStyle> set) {
             return finish(Option.<Color>createBuilder()
-                    .name(Component.literal(name))
+                    .name(Component.translatable(key))
                     .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)),
-                "Colour and transparency of: " + name.toLowerCase(Locale.ROOT) + ".",
+                Component.translatable("chat-tabs.config.appearance.colour.desc",
+                    I18n.get(key).toLowerCase(Locale.ROOT)),
                 new Color(def, true), st -> new Color(get.applyAsInt(st), true), (st, c) -> set.accept(st, c.getRGB()));
         }
 
-        Option<Integer> slider(String name, String description, int min, int max, int def,
-                               Function<TabStyle, Integer> get, BiConsumer<TabStyle, Integer> set) {
+        Option<Integer> slider(String key, int min, int max, int def, Function<TabStyle, Integer> get,
+                               BiConsumer<TabStyle, Integer> set) {
             return finish(Option.<Integer>createBuilder()
-                    .name(Component.literal(name))
+                    .name(Component.translatable(key))
                     .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(min, max).step(1)),
-                description, def, get, set);
+                Component.translatable(key + ".desc"), def, get, set);
         }
 
-        Option<Boolean> toggle(String name, String description, boolean def, Function<TabStyle, Boolean> get,
+        Option<Boolean> toggle(String key, boolean def, Function<TabStyle, Boolean> get,
                                BiConsumer<TabStyle, Boolean> set) {
             return finish(Option.<Boolean>createBuilder()
-                    .name(Component.literal(name))
+                    .name(Component.translatable(key))
                     .controller(opt -> BooleanControllerBuilder.create(opt).onOffFormatter().coloured(true)),
-                description, def, get, set);
+                Component.translatable(key + ".desc"), def, get, set);
         }
     }
 
