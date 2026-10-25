@@ -1,0 +1,5 @@
+// One jar per Minecraft version, built from the same src/: ./gradlew build builds every version in versions/.
+// Loom is applied by each version's subproject; the shared build is common.gradle.
+plugins {
+	id 'net.fabricmc.fabric-loom' version '1.17.21' apply false
+}

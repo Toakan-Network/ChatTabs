@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "chat-tabs",
+	"version": "${version}",
+	"name": "ChatTabs",
+	"description": "WoW-style chat tabs for Hypixel. Tabs filter chat by channel (Guild, Officer, Party, Co-op, DMs, System), typing in a tab sends to its channel, DMs get their own tabs and inactive tabs count unread messages. Client-side; off on other servers.",
+	"authors": [
+		"Tad"
+	],
+	"license": "GPL-3.0-only",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"chattabs.ChatTabsClient"
+		],
+		"modmenu": [
+			"chattabs.compat.ModMenuCompat"
+		]
+	},
+	"mixins": [
+		"chat-tabs.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "${minecraft_range}",
+		"java": ">=25",
+		"fabric-api": ">=0.161.0",
+		"yet_another_config_lib_v3": ">=3.9.7"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}

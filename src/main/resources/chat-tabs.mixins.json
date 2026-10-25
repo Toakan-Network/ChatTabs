@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "chattabs.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ChatComponentMixin",
+    "ChatScreenAccessor",
+    "ChatScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
