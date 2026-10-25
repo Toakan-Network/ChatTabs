@@ -42,6 +42,9 @@ moves or scales the chat. Pick where in Settings > General > Tab bar:
   screen edges, and keep their place next to the chat when the chat moves. A click without moving still opens a
   tab. Reset free position puts the bar back just above the chat.
 
+The tab bar also stays on screen while chat is closed, in the same spot, so you can see unread counts while you
+play. Open chat to click a tab. Turn it off with Settings > General > Tabs while chat is closed.
+
 ## DM tabs
 When you message a player or one messages you, a tab with their name opens. Typing there sends `/msg <name>`.
 Right click a DM tab to close it. The oldest closes when the limit is reached (5 by default). DM tabs close when
@@ -51,7 +54,8 @@ you leave the server.
 A tab you aren't looking at shows how many new messages it has, e.g. `Guild (3)`, in the unread colour.
 
 ## Settings
-- **General:** turn tabs on or off, DM tabs and their limit, unread counts, tab bar position.
+- **General:** turn tabs on or off, DM tabs and their limit, unread counts, tabs while chat is closed, tab bar
+  position.
 - **Tabs:** one section per tab: name, which channels it shows, where typing sends, move left or right, delete.
   Add tab and Reset tabs at the bottom. These buttons save at once, along with anything else you changed.
 - **Appearance:** colours (background, border and text for normal, hovered, open and unread tabs), tab height,

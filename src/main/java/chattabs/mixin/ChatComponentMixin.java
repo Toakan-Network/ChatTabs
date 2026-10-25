@@ -32,19 +32,17 @@ abstract class ChatComponentMixin {
     }
 
     /**
-     * Records where the open chat is, for the tab bar. Vanilla's one updatePose call scales chat; any mod that moves
-     * chat has changed the pose before it, so the pose after it maps chat's own coordinates to the screen.
+     * Records where chat is, for the tab bar, open or closed. Vanilla's one updatePose call scales chat; any mod that
+     * moves chat has changed the pose before it, so the pose after it maps chat's own coordinates to the screen.
      */
     @WrapOperation(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V",
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;updatePose(Ljava/util/function/Consumer;)V"))
     private void chattabs$recordFrame(ChatComponent.ChatGraphicsAccess graphics, Consumer<Matrix3x2f> updater,
-                                      Operation<Void> original, @Local(argsOnly = true, ordinal = 0) int screenHeight,
-                                      @Local(argsOnly = true) ChatComponent.DisplayMode displayMode) {
-        ChatComponent chat = (ChatComponent) (Object) this;
+                                      Operation<Void> original, @Local(argsOnly = true, ordinal = 0) int screenHeight) {
         original.call(graphics, (Consumer<Matrix3x2f>) pose -> {
             updater.accept(pose);
-            if (displayMode.foreground) ChatFrame.record(pose, chat, screenHeight);
+            ChatFrame.record(pose, screenHeight);
         });
     }
 }

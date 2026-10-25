@@ -17,6 +17,8 @@
   "chat-tabs.config.general.max_dm_tabs.desc": "How many DM tabs can be open; a new conversation closes the oldest.",
   "chat-tabs.config.general.unread": "Unread counts",
   "chat-tabs.config.general.unread.desc": "Show how many new messages a tab has, e.g. Guild (3).",
+  "chat-tabs.config.general.bar_closed": "Tabs while chat is closed",
+  "chat-tabs.config.general.bar_closed.desc": "Keep the tab bar on screen when chat is closed, so you can see unread counts. Tabs are clicked with chat open.",
   "chat-tabs.config.general.bar_position": "Tab bar",
   "chat-tabs.config.general.bar_position.desc": "Top: above the chat. Bottom: under the chat. Free: drag the tabs in chat to place them; they snap to the chat's edges and keep their place next to it when the chat moves (e.g. with Huddable).",
   "chat-tabs.config.general.bar_position.top": "Top",

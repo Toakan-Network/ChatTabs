@@ -1,6 +1,8 @@
 package chattabs;
 
 import chattabs.mixin.ChatScreenAccessor;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.Minecraft;
@@ -9,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +19,16 @@ import java.util.List;
 /**
  * The row of tabs on the chat screen, stuck to the chat wherever it is ({@link ChatFrame}): above it, under it, or
  * at a dragged offset from it (Free). Left click opens a tab, right click closes a DM tab, and in Free a left drag
- * moves the bar, snapping to the chat's and the screen's edges.
+ * moves the bar, snapping to the chat's and the screen's edges. While chat is closed the same bar is drawn on the
+ * HUD (Settings > General), without clicks, so unread counts show.
  */
 final class TabBar {
     /** The bar's bottom never goes below this distance from the screen bottom (the input box is under it). */
     private static final int INPUT_CLEARANCE = 15;
     /** How far (GUI pixels) a press must move before it drags the bar rather than clicking a tab. */
     private static final int DRAG_THRESHOLD = 3;
+    /** The HUD layer for the bar while chat is closed, drawn right after vanilla's chat. */
+    private static final Identifier HUD_LAYER = Identifier.fromNamespaceAndPath(ChatTabsClient.MOD_ID, "tab_bar");
 
     /** Where the bar is this frame: its top-left corner and each tab's label and width. */
     private record Layout(int x, int y, int height, List<Component> labels, int[] widths) {
@@ -54,6 +60,11 @@ final class TabBar {
             ScreenMouseEvents.allowMouseDrag(screen).register((s, event, dx, dy) -> !drag(chat, event));
             ScreenMouseEvents.allowMouseRelease(screen).register((s, event) -> !release());
         });
+        HudElementRegistry.attachElementAfter(VanillaHudElements.CHAT, HUD_LAYER, (graphics, delta) -> {
+            Minecraft mc = Minecraft.getInstance();
+            if (!ChatTabs.isActive() || !ChatTabs.config().showBarClosed || mc.gui.screen() instanceof ChatScreen) return;
+            drawBar(graphics, layout(graphics.guiWidth(), graphics.guiHeight()), -1, -1);
+        });
     }
 
     /** Hidden off Hypixel, and at the bottom while a command is typed so its suggestions aren't covered. */
@@ -64,6 +75,10 @@ final class TabBar {
     }
 
     private static Layout layout(ChatScreen screen) {
+        return layout(screen.width, screen.height);
+    }
+
+    private static Layout layout(int screenWidth, int screenHeight) {
         TabStyle style = TabStyle.get();
         Font font = Minecraft.getInstance().font;
         List<Tab> tabs = ChatTabs.tabs();
@@ -77,26 +92,30 @@ final class TabBar {
         Layout sized = new Layout(0, 0, style.tabHeight, labels, widths);
         int barWidth = sized.width(style.gap);
         Config config = ChatTabs.config();
-        ChatFrame.Box chat = ChatFrame.bounds(screen.height);
+        ChatFrame.Box chat = ChatFrame.bounds(screenHeight);
         int x = chat.left();
         int y = switch (config.barPosition) {
             case TOP -> chat.top() - 1 - style.tabHeight;
-            case BOTTOM -> Math.min(chat.bottom() + 1, screen.height - INPUT_CLEARANCE - style.tabHeight);
+            case BOTTOM -> Math.min(chat.bottom() + 1, screenHeight - INPUT_CLEARANCE - style.tabHeight);
             case FREE -> {
                 x = chat.left() + config.freeX;
                 yield chat.top() + config.freeY;
             }
         };
-        x = Math.clamp(x, 0, Math.max(0, screen.width - barWidth));
-        y = Math.clamp(y, 0, Math.max(0, screen.height - style.tabHeight));
+        x = Math.clamp(x, 0, Math.max(0, screenWidth - barWidth));
+        y = Math.clamp(y, 0, Math.max(0, screenHeight - style.tabHeight));
         return new Layout(x, y, style.tabHeight, labels, widths);
     }
 
     private static void draw(ChatScreen screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (hidden(screen)) return;
+        drawBar(graphics, layout(screen), mouseX, mouseY);
+    }
+
+    /** Every tab of {@code bar}; the one under the mouse is drawn hovered. */
+    private static void drawBar(GuiGraphicsExtractor graphics, Layout bar, int mouseX, int mouseY) {
         TabStyle style = TabStyle.get();
         Font font = Minecraft.getInstance().font;
-        Layout bar = layout(screen);
         int x = bar.x();
         for (int i = 0; i < bar.widths().length; i++) {
             int w = bar.widths()[i];

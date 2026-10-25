@@ -14,6 +14,10 @@
 - 0.2.0: the tab bar follows the chat (`ChatFrame` reads chat's pose), positions Top / Bottom / Free with drag
   and snapping in Free.
 - 0.2.1: live preview in Settings > Appearance (draft style copy, as in CraftingTracker).
+- 0.2.2: Settings text in a lang file (`assets/chat-tabs/lang/en_us.json`).
+- 0.2.3: the tab bar shows on the HUD while chat is closed (Settings > General > Tabs while chat is closed, on by
+  default): a Fabric HUD layer after vanilla's chat. `ChatFrame` now records closed chat too and always uses the
+  open chat's height, so the bar doesn't move when chat opens.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs
@@ -27,11 +31,12 @@
 - Together with compacting (`(x2)` merging across tab switches), morechathistory (long history) and
   beautifiedchatclient (does it change the prefixes?).
 - `ChatScreenMixin` applies when the chat screen first opens; not yet exercised.
+- 0.2.3 closed-chat bar: Huddable lists it as its own layer (`chat-tabs:tab_bar`); moving it there adds an offset on
+  top of following chat. Top placement with a short unfocused chat height.
 - 26.3 in a real client.
 
 ## Next
 - Appearance presets and share codes, as in Shopping List's `HudPresets`.
 - Style the chat background per tab.
-- Optional tab bar while chat is closed, so unread counts show.
 - Custom regex filters per tab.
 - Stretch: detachable, resizable chat windows (each tab drawn as its own panel).

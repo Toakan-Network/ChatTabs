@@ -11,6 +11,8 @@ public final class Config {
     /** Most DM tabs open at once; the oldest closes for a new one. */
     public int maxWhisperTabs = 5;
     public boolean showUnread = true;
+    /** Draw the tab bar on the HUD while chat is closed, so unread counts show. */
+    public boolean showBarClosed = true;
     public BarPosition barPosition = BarPosition.BOTTOM;
     /** Free bar position: offset of its top-left corner from the chat's top-left corner. */
     public int freeX = 0;

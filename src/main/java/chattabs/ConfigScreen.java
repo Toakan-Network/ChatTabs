@@ -79,6 +79,8 @@ public final class ConfigScreen {
             .option(slider("chat-tabs.config.general.max_dm_tabs", 1, 20, d.maxWhisperTabs, () -> c.maxWhisperTabs,
                 v -> c.maxWhisperTabs = v))
             .option(toggle("chat-tabs.config.general.unread", d.showUnread, () -> c.showUnread, v -> c.showUnread = v))
+            .option(toggle("chat-tabs.config.general.bar_closed", d.showBarClosed, () -> c.showBarClosed,
+                v -> c.showBarClosed = v))
             .option(Option.<Config.BarPosition>createBuilder()
                 .name(Component.translatable("chat-tabs.config.general.bar_position"))
                 .description(OptionDescription.of(Component.translatable("chat-tabs.config.general.bar_position.desc")))

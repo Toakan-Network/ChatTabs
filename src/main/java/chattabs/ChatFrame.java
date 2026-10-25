@@ -8,7 +8,8 @@ import org.joml.Vector2f;
 
 /**
  * Where the open chat is on screen, so the tab bar can stick to it. Read from the pose chat is drawn with (see
- * {@code ChatComponentMixin}), so it follows any mod that moves or scales chat, such as Huddable.
+ * {@code ChatComponentMixin}), so it follows any mod that moves or scales chat, such as Huddable. Closed chat is
+ * drawn with the same pose, and the box always has the open chat's height, so the bar stays put when chat opens.
  */
 public final class ChatFrame {
     /** A box in screen (GUI) pixels. */
@@ -22,22 +23,26 @@ public final class ChatFrame {
 
     private ChatFrame() {}
 
-    /** Called with chat's pose right after vanilla scaled it, while the open chat is drawn or hit-tested. */
-    public static void record(Matrix3x2f pose, ChatComponent chat, int screenHeight) {
+    /** Called with chat's pose right after vanilla scaled it, while chat (open or closed) is drawn or hit-tested. */
+    public static void record(Matrix3x2f pose, int screenHeight) {
         Options options = Minecraft.getInstance().options;
         last = box(pose, options.chatScale().get(), ChatComponent.getWidth(options.chatWidth().get()),
-            entryHeight(options), chat.getLinesPerPage(), screenHeight);
+            entryHeight(options), openLines(options), screenHeight);
     }
 
     /** The open chat's box from the last frame, or where vanilla puts it before chat has been drawn. */
     public static Box bounds(int screenHeight) {
         if (last != null) return last;
-        Minecraft mc = Minecraft.getInstance();
-        Options options = mc.options;
+        Options options = Minecraft.getInstance().options;
         double scale = options.chatScale().get();
         Matrix3x2f pose = new Matrix3x2f().scale((float) scale, (float) scale).translate(4, 0);
         return box(pose, scale, ChatComponent.getWidth(options.chatWidth().get()), entryHeight(options),
-            mc.gui.hud.getChat().getLinesPerPage(), screenHeight);
+            openLines(options), screenHeight);
+    }
+
+    /** Lines in the open chat, as {@code ChatComponent.getLinesPerPage} works it out while chat is focused. */
+    private static int openLines(Options options) {
+        return ChatComponent.getHeight(options.chatHeightFocused().get()) / entryHeight(options);
     }
 
     private static int entryHeight(Options options) {
