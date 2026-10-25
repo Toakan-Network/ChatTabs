@@ -1,4 +1,4 @@
-package chattabs;
+package uk.toakan.tad.chattabs;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

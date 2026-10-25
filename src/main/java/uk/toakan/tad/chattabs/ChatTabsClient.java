@@ -1,4 +1,4 @@
-package chattabs;
+package uk.toakan.tad.chattabs;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;

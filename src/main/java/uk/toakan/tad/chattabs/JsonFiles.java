@@ -1,4 +1,4 @@
-package chattabs;
+package uk.toakan.tad.chattabs;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

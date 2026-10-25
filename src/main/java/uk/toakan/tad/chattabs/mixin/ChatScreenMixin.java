@@ -1,6 +1,6 @@
-package chattabs.mixin;
+package uk.toakan.tad.chattabs.mixin;
 
-import chattabs.ChatTabs;
+import uk.toakan.tad.chattabs.ChatTabs;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.screens.ChatScreen;

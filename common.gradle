@@ -37,7 +37,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Mod Menu (optional): its "Configure" button opens Settings. Only Mod Menu loads
-	// chattabs.compat.ModMenuCompat (fabric.mod.json entrypoint).
+	// uk.toakan.tad.chattabs.compat.ModMenuCompat (fabric.mod.json entrypoint).
 	compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") { transitive = false }
 
 	// YetAnotherConfigLib for the Settings screen. Required at runtime ("depends" in fabric.mod.json), not bundled.

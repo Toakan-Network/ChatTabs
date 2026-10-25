@@ -1,8 +1,8 @@
-package chattabs.compat;
+package uk.toakan.tad.chattabs.compat;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import chattabs.ConfigScreen;
+import uk.toakan.tad.chattabs.ConfigScreen;
 
 /**
  * Mod Menu's "Configure" button for this mod, opening the Settings screen. Loaded only by Mod Menu through the

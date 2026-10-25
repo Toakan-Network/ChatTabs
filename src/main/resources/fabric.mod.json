@@ -11,10 +11,10 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"chattabs.ChatTabsClient"
+			"uk.toakan.tad.chattabs.ChatTabsClient"
 		],
 		"modmenu": [
-			"chattabs.compat.ModMenuCompat"
+			"uk.toakan.tad.chattabs.compat.ModMenuCompat"
 		]
 	},
 	"mixins": [

@@ -1,6 +1,6 @@
-package chattabs;
+package uk.toakan.tad.chattabs;
 
-import chattabs.mixin.ChatScreenAccessor;
+import uk.toakan.tad.chattabs.mixin.ChatScreenAccessor;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;

@@ -1,6 +1,6 @@
 # ChatTabs
 
-Fabric client mod (mod id `chat-tabs`, Java package `chattabs`): WoW-style chat tabs for Hypixel. Tabs filter the
+Fabric client mod (mod id `chat-tabs`, Java package `uk.toakan.tad.chattabs`): WoW-style chat tabs for Hypixel. Tabs filter the
 vanilla chat by channel, typing in a tab sends to its channel, DMs get their own tabs, inactive tabs count unread
 messages. Loom 1.17, Java 25.
 

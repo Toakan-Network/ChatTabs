@@ -1,7 +1,7 @@
-package chattabs.mixin;
+package uk.toakan.tad.chattabs.mixin;
 
-import chattabs.ChatFrame;
-import chattabs.ChatTabs;
+import uk.toakan.tad.chattabs.ChatFrame;
+import uk.toakan.tad.chattabs.ChatTabs;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;

@@ -1,4 +1,4 @@
-package chattabs;
+package uk.toakan.tad.chattabs;
 
 import org.joml.Matrix3x2f;
 import org.junit.jupiter.api.Test;

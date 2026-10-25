@@ -1,4 +1,4 @@
-package chattabs;
+package uk.toakan.tad.chattabs;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 

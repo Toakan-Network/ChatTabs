@@ -1,4 +1,4 @@
-package chattabs;
+package uk.toakan.tad.chattabs;
 
 /**
  * Snapping (from Huddable): a dragged element's left edge, centre or right edge (or top, middle, bottom) jumps to a
