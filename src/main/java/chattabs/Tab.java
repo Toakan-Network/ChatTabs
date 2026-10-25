@@ -31,7 +31,7 @@ public final class Tab {
 
     public boolean shows(MessageClassifier.Result message) {
         if (whisperWith != null) return message.channel() == Channel.DM && whisperWith.equalsIgnoreCase(message.partner());
-        return channels.contains(Channel.ALL) || channels.contains(message.channel());
+        return channels.contains(Channel.EVERYTHING) || channels.contains(message.channel());
     }
 
     /** The command (without the slash) that sends {@code message} from this tab, or null for normal chat. */

@@ -2,7 +2,8 @@
 
 WoW-style chat tabs for Hypixel.
 
-- Tabs for Guild, Officer, Party, Co-op, DMs, System or everything; a message shows in every tab that matches
+- Tabs for All chat, Guild, Officer, Party, Co-op, DMs, System (NPCs and server messages) or everything; a
+  message shows in every tab that matches
 - Type in a tab to send to its channel (Guild tab sends `/gc`, Party `/pc`), no channel switching to undo
 - A tab per DM conversation, opened for you
 - Unread counts on the other tabs

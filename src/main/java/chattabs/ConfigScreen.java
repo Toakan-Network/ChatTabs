@@ -31,9 +31,9 @@ import java.util.function.Supplier;
  * {@link TabStyle#get()}, and Save writes both files. The tab buttons (add, move, delete) save straight away.
  */
 public final class ConfigScreen {
-    /** Where a tab can send typed chat; System and All both mean normal chat, so only All is offered. */
-    private static final List<Channel> SEND_TO = List.of(
-        Channel.ALL, Channel.GUILD, Channel.OFFICER, Channel.PARTY, Channel.COOP, Channel.DM);
+    /** Where a tab can send typed chat; System and Everything both mean normal chat, so only Everything is offered. */
+    private static final List<Channel> SEND_TO = List.of(Channel.EVERYTHING, Channel.ALL_CHAT, Channel.GUILD,
+        Channel.OFFICER, Channel.PARTY, Channel.COOP, Channel.DM);
 
     private ConfigScreen() {}
 
@@ -101,7 +101,8 @@ public final class ConfigScreen {
                     .name(Component.literal("Send to"))
                     .description(OptionDescription.of(Component.literal(
                         "Where chat typed in this tab goes. Commands you type (starting with /) are sent as they are.")))
-                    .binding(Channel.ALL, () -> SEND_TO.contains(tab.sendTo) ? tab.sendTo : Channel.ALL, v -> tab.sendTo = v)
+                    .binding(Channel.EVERYTHING, () -> SEND_TO.contains(tab.sendTo) ? tab.sendTo : Channel.EVERYTHING,
+                        v -> tab.sendTo = v)
                     .controller(opt -> CyclingListControllerBuilder.create(opt).values(SEND_TO)
                         .formatValue(c -> Component.literal(c.command == null ? "Normal chat" : c.label + " (/" + c.command + ")")))
                     .build())
@@ -119,8 +120,10 @@ public final class ConfigScreen {
         category.group(OptionGroup.createBuilder()
             .name(Component.literal("New tab"))
             .option(button("Add tab", "Add", "Adds a tab showing every message, at the right end." + saveFirst,
-                () -> tabs.add(new Config.TabConfig("Tab " + (tabs.size() + 1), List.of(Channel.ALL), Channel.ALL)), reopen))
-            .option(button("Reset tabs", "Reset", "Puts back the default tabs: All, Guild, Party and DMs." + saveFirst, () -> {
+                () -> tabs.add(new Config.TabConfig("Tab " + (tabs.size() + 1), List.of(Channel.EVERYTHING),
+                    Channel.EVERYTHING)), reopen))
+            .option(button("Reset tabs", "Reset", "Puts back the default tabs: General, All, Guild, Party, DMs and "
+                + "System." + saveFirst, () -> {
                 tabs.clear();
                 tabs.addAll(Config.defaultTabs());
             }, reopen))
@@ -130,13 +133,14 @@ public final class ConfigScreen {
 
     private static String showDescription(Channel channel) {
         return switch (channel) {
+            case ALL_CHAT -> "Public chat from players (\"[598] [MVP+] Name: ...\").";
             case GUILD -> "Lines starting with \"Guild >\".";
             case OFFICER -> "Lines starting with \"Officer >\".";
             case PARTY -> "Lines starting with \"Party >\".";
             case COOP -> "Lines starting with \"Co-op >\" (SkyBlock co-op chat).";
             case DM -> "Messages from and to players (\"From ...\" and \"To ...\").";
-            case SYSTEM -> "Everything that isn't one of the channels above: public chat, server messages.";
-            case ALL -> "Every message.";
+            case SYSTEM -> "Everything that isn't one of the channels above: NPCs, server and game messages.";
+            case EVERYTHING -> "Every message.";
         };
     }
 

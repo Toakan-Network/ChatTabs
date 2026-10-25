@@ -8,10 +8,15 @@
 - Settings (YACL): General, Tabs (add, delete, move, channels, send to), Appearance (Shopping List style system:
   colours, sizes, border, radius, font, shadow).
 - Builds for 26.2 and 26.3; unit tests for the classifier; the dev client starts with `ChatComponentMixin` applied.
+- 0.1.1: All chat channel (public player chat, `/ac`) split from System; old "All" is now Everything (0.1.0 files
+  read `ALL` as `EVERYTHING`). Default tabs General, All, Guild, Party, DMs, System.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs
-  (only `Guild >` and `From stash:` were). Commands `/oc` and `/cc` to confirm.
+  (only `Guild >` and `From stash:` were). Commands `/ac`, `/oc` and `/cc` to confirm.
+- All chat: SkyBlock lines (level, ranks VIP to MVP++, unranked) are from the logs; lobby lines (no level) and
+  staff ranks are not. A player-chat line that lands in System means the rank list or pattern needs a case.
+- With Huddable moving chat, the tab bar stays above the input box rather than following the chat.
 - Together with compacting (`(x2)` merging across tab switches), morechathistory (long history) and
   beautifiedchatclient (does it change the prefixes?).
 - `ChatScreenMixin` applies when the chat screen first opens; not yet exercised.

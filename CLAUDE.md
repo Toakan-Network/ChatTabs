@@ -24,7 +24,9 @@ update it in the same commit when a step lands or an issue is found or fixed.
   `@WrapOperation` so these stack.
 - `ChatScreenMixin` wraps `sendChat` in `ChatScreen.handleChatInput` only, so other mods' sends aren't rerouted.
 - Classification is `MessageClassifier` on the plain text with `§` codes stripped (Hypixel sends them in the text).
-  `From stash:` is a SkyBlock notice, not a DM. Unit tested; add a case for every new format.
+  `From stash:` is a SkyBlock notice, not a DM. All chat needs a SkyBlock level, a player rank from `RANKS`, or
+  the gray unranked lobby form; `[NPC]`, `[FEAR]` and the like stay System. Unit tested; add a case for every new
+  format.
 - Tab bar: Fabric `ScreenEvents.afterExtract` / `ScreenMouseEvents.allowMouseClick` on `ChatScreen`, drawn in the
   gap between chat (bottom `height - 40`) and input (`height - 14`), hidden while a `/` command is typed.
 - Look: `TabStyle` (style.json) is Skyblock Shopping List's `HudStyle` cut down to the tab bar, with its palette as

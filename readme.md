@@ -14,17 +14,21 @@ Open chat (T) and click a tab. The chat shows that tab's messages, history inclu
 
 | Tab | Shows | Typing sends |
 |---|---|---|
-| All | every message | normal chat |
+| General | every message | normal chat |
+| All | public player chat | `/ac` |
 | Guild | Guild and Officer | `/gc` |
 | Party | Party | `/pc` |
 | DMs | every DM | `/r` (reply) |
+| System | NPCs, server and game messages | normal chat |
 
 A message shows in every tab that matches it. Channels are read from Hypixel's prefixes:
 
+- **All chat** players talking in public: `[598] [MVP+] Name: ...` on SkyBlock, `[VIP] Name: ...` in lobbies.
+  `[NPC]`, `[BOSS]` and similar speakers aren't players, so they go to System.
 - **Guild** `Guild > ...`, **Officer** `Officer > ...`, **Party** `Party > ...`, **Co-op** `Co-op > ...`
 - **DMs** `From <player>: ...` and `To <player>: ...`
-- **System** everything else (public chat, server messages)
-- **All** every message
+- **System** everything else (NPCs, server and game messages)
+- **Everything** every message
 
 Commands you type (starting with `/`) are always sent as they are, and the tab bar steps aside while you type one
 so the suggestions stay readable.
