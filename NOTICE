@@ -1,9 +1,9 @@
 ChatTabs
 Copyright (C) 2026 Tad (Toakan)
 
-Contains code from CraftingTracker
+Contains code from CraftingTracker, Skyblock Shopping List and Huddable
 Copyright (C) 2026 Tad (Toakan) <https://github.com/Toakan/Skyblock-Shopping-List>
-(JSON file helpers).
+(JSON file helpers, style system and rounded boxes, panel snapping).
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

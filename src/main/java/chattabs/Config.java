@@ -11,7 +11,17 @@ public final class Config {
     /** Most DM tabs open at once; the oldest closes for a new one. */
     public int maxWhisperTabs = 5;
     public boolean showUnread = true;
+    public BarPosition barPosition = BarPosition.BOTTOM;
+    /** Free bar position: offset of its top-left corner from the chat's top-left corner. */
+    public int freeX = 0;
+    public int freeY = FREE_Y_DEFAULT;
     public List<TabConfig> tabs = defaultTabs();
+
+    /** Free position's default: just above the chat. */
+    static final int FREE_Y_DEFAULT = -13;
+
+    /** Where the tab bar sits: above the chat, under it, or where it was dragged (still moving with the chat). */
+    public enum BarPosition { TOP, BOTTOM, FREE }
 
     /** A tab the player set up. */
     public static final class TabConfig {
@@ -53,5 +63,8 @@ public final class Config {
         }
         if (tabs.isEmpty()) tabs = defaultTabs();
         maxWhisperTabs = Math.clamp(maxWhisperTabs, 0, 20);
+        if (barPosition == null) barPosition = BarPosition.BOTTOM;
+        freeX = Math.clamp(freeX, -10000, 10000);
+        freeY = Math.clamp(freeY, -10000, 10000);
     }
 }

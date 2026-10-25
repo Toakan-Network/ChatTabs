@@ -30,8 +30,17 @@ A message shows in every tab that matches it. Channels are read from Hypixel's p
 - **System** everything else (NPCs, server and game messages)
 - **Everything** every message
 
-Commands you type (starting with `/`) are always sent as they are, and the tab bar steps aside while you type one
-so the suggestions stay readable.
+Commands you type (starting with `/`) are always sent as they are.
+
+## Tab bar position
+The tab bar sticks to the chat window, also when a mod such as [Huddable](https://modrinth.com/mod/huddable)
+moves or scales the chat. Pick where in Settings > General > Tab bar:
+
+- **Bottom** (default): under the chat, above the input box. Steps aside while you type a command.
+- **Top:** above the chat.
+- **Free:** drag the tabs (left click and move) to any spot. They snap to the chat's edges and centre and to the
+  screen edges, and keep their place next to the chat when the chat moves. A click without moving still opens a
+  tab. Reset free position puts the bar back just above the chat.
 
 ## DM tabs
 When you message a player or one messages you, a tab with their name opens. Typing there sends `/msg <name>`.
@@ -42,7 +51,7 @@ you leave the server.
 A tab you aren't looking at shows how many new messages it has, e.g. `Guild (3)`, in the unread colour.
 
 ## Settings
-- **General:** turn tabs on or off, DM tabs and their limit, unread counts.
+- **General:** turn tabs on or off, DM tabs and their limit, unread counts, tab bar position.
 - **Tabs:** one section per tab: name, which channels it shows, where typing sends, move left or right, delete.
   Add tab and Reset tabs at the bottom. These buttons save at once, along with anything else you changed.
 - **Appearance:** colours (background, border and text for normal, hovered, open and unread tabs), tab height,

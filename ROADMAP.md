@@ -10,13 +10,19 @@
 - Builds for 26.2 and 26.3; unit tests for the classifier; the dev client starts with `ChatComponentMixin` applied.
 - 0.1.1: All chat channel (public player chat, `/ac`) split from System; old "All" is now Everything (0.1.0 files
   read `ALL` as `EVERYTHING`). Default tabs General, All, Guild, Party, DMs, System.
+- 0.1.2: the Tabs settings buttons keep unsaved edits, the category and the edited tab's section open.
+- 0.2.0: the tab bar follows the chat (`ChatFrame` reads chat's pose), positions Top / Bottom / Free with drag
+  and snapping in Free.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs
   (only `Guild >` and `From stash:` were). Commands `/ac`, `/oc` and `/cc` to confirm.
 - All chat: SkyBlock lines (level, ranks VIP to MVP++, unranked) are from the logs; lobby lines (no level) and
   staff ranks are not. A player-chat line that lands in System means the rank list or pattern needs a case.
-- With Huddable moving chat, the tab bar stays above the input box rather than following the chat.
+- Tab bar following chat moved or scaled by Huddable; Top / Bottom / Free placement and the Free drag and snap.
+- The Tabs settings buttons (category kept, section left open, unsaved edits kept).
+- Known: when the open tab has no messages, vanilla skips drawing chat, so the bar uses the last known chat box
+  (vanilla's spot until chat has been drawn once).
 - Together with compacting (`(x2)` merging across tab switches), morechathistory (long history) and
   beautifiedchatclient (does it change the prefixes?).
 - `ChatScreenMixin` applies when the chat screen first opens; not yet exercised.

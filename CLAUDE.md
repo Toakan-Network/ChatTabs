@@ -27,8 +27,11 @@ update it in the same commit when a step lands or an issue is found or fixed.
   `From stash:` is a SkyBlock notice, not a DM. All chat needs a SkyBlock level, a player rank from `RANKS`, or
   the gray unranked lobby form; `[NPC]`, `[FEAR]` and the like stay System. Unit tested; add a case for every new
   format.
-- Tab bar: Fabric `ScreenEvents.afterExtract` / `ScreenMouseEvents.allowMouseClick` on `ChatScreen`, drawn in the
-  gap between chat (bottom `height - 40`) and input (`height - 14`), hidden while a `/` command is typed.
+- Tab bar: Fabric `ScreenEvents.afterExtract` and `ScreenMouseEvents` (click, drag, release) on `ChatScreen`.
+  It sticks to the chat box from `ChatFrame`, which `ChatComponentMixin` records from the pose right after vanilla's
+  one `updatePose` call in `extractRenderState`. Any chat mover (Huddable) changes the pose before that, so no
+  Huddable code or dependency is needed. Top / Bottom / Free (`Config.barPosition`, Free is an offset from the
+  chat's top-left, snapping via `PanelSnap` copied from Huddable). Bottom hides while a `/` command is typed.
 - Look: `TabStyle` (style.json) is Skyblock Shopping List's `HudStyle` cut down to the tab bar, with its palette as
   defaults, and `RoundedBox` is copied from it. Keep option names and clamps in step with Shopping List.
 - Dependencies: Fabric API and YACL (Settings). Mod Menu optional; only `compat.ModMenuCompat` touches it.

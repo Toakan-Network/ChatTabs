@@ -49,10 +49,15 @@ public final class ChatTabs {
 
     /** Saves the settings and applies them to the tab bar, keeping open DM tabs. */
     public static void saveConfig() {
-        config.sanitize();
-        JsonFiles.write(CONFIG_FILE, config);
+        writeConfig();
         rebuildTabs();
         refreshChat();
+    }
+
+    /** Saves the settings file only, for changes that don't touch the tabs (the dragged bar position). */
+    static void writeConfig() {
+        config.sanitize();
+        JsonFiles.write(CONFIG_FILE, config);
     }
 
     private static void rebuildTabs() {

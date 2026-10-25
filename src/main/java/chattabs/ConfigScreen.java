@@ -10,6 +10,7 @@ import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
 import dev.isxander.yacl3.api.controller.CyclingListControllerBuilder;
 import dev.isxander.yacl3.api.controller.DropdownStringControllerBuilder;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
@@ -37,6 +38,7 @@ public final class ConfigScreen {
         Channel.OFFICER, Channel.PARTY, Channel.COOP, Channel.DM);
 
     /** Category positions, for reopening the screen where a button was pressed. */
+    private static final int GENERAL_CATEGORY = 0;
     private static final int TABS_CATEGORY = 1;
     private static final int APPEARANCE_CATEGORY = 2;
     /** The tab section left open when a Tabs button rebuilt the screen, or -1. Used once. */
@@ -47,7 +49,7 @@ public final class ConfigScreen {
     public static Screen create(Screen parent) {
         return YetAnotherConfigLib.createBuilder()
             .title(Component.literal(ChatTabsClient.NAME))
-            .category(general())
+            .category(general(parent))
             .category(tabs(parent))
             .category(appearance(parent))
             .save(() -> {
@@ -58,7 +60,7 @@ public final class ConfigScreen {
             .generateScreen(parent);
     }
 
-    private static ConfigCategory general() {
+    private static ConfigCategory general(Screen parent) {
         Config c = ChatTabs.config();
         Config d = new Config();
         return ConfigCategory.createBuilder()
@@ -71,6 +73,26 @@ public final class ConfigScreen {
                 1, 20, d.maxWhisperTabs, () -> c.maxWhisperTabs, v -> c.maxWhisperTabs = v))
             .option(toggle("Unread counts", "Show how many new messages a tab has, e.g. Guild (3).",
                 d.showUnread, () -> c.showUnread, v -> c.showUnread = v))
+            .option(Option.<Config.BarPosition>createBuilder()
+                .name(Component.literal("Tab bar"))
+                .description(OptionDescription.of(Component.literal(
+                    "Top: above the chat. Bottom: under the chat. Free: drag the tabs in chat to place them; they "
+                        + "snap to the chat's edges and keep their place next to it when the chat moves (e.g. with "
+                        + "Huddable).")))
+                .binding(d.barPosition, () -> c.barPosition, v -> c.barPosition = v)
+                .controller(opt -> EnumControllerBuilder.create(opt).enumClass(Config.BarPosition.class)
+                    .formatValue(p -> Component.literal(switch (p) {
+                        case TOP -> "Top";
+                        case BOTTOM -> "Bottom";
+                        case FREE -> "Free";
+                    })))
+                .build())
+            .option(button("Reset free position", "Reset", "Puts a Free tab bar back just above the chat.",
+                parent, GENERAL_CATEGORY, () -> {
+                    c.freeX = 0;
+                    c.freeY = Config.FREE_Y_DEFAULT;
+                    return -1;
+                }))
             .build();
     }
 
