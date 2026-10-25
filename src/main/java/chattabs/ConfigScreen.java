@@ -13,6 +13,7 @@ import dev.isxander.yacl3.api.controller.DropdownStringControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
+import dev.isxander.yacl3.gui.YACLScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -35,15 +36,20 @@ public final class ConfigScreen {
     private static final List<Channel> SEND_TO = List.of(Channel.EVERYTHING, Channel.ALL_CHAT, Channel.GUILD,
         Channel.OFFICER, Channel.PARTY, Channel.COOP, Channel.DM);
 
+    /** Category positions, for reopening the screen where a button was pressed. */
+    private static final int TABS_CATEGORY = 1;
+    private static final int APPEARANCE_CATEGORY = 2;
+    /** The tab section left open when a Tabs button rebuilt the screen, or -1. Used once. */
+    private static int expandedTab = -1;
+
     private ConfigScreen() {}
 
     public static Screen create(Screen parent) {
-        Runnable reopen = () -> Minecraft.getInstance().gui.setScreen(create(parent));
         return YetAnotherConfigLib.createBuilder()
             .title(Component.literal(ChatTabsClient.NAME))
             .category(general())
-            .category(tabs(reopen))
-            .category(appearance(reopen))
+            .category(tabs(parent))
+            .category(appearance(parent))
             .save(() -> {
                 ChatTabs.saveConfig();
                 TabStyle.save();
@@ -68,9 +74,10 @@ public final class ConfigScreen {
             .build();
     }
 
-    private static ConfigCategory tabs(Runnable reopen) {
+    private static ConfigCategory tabs(Screen parent) {
         List<Config.TabConfig> tabs = ChatTabs.config().tabs;
-        String saveFirst = " Press Save first if you have unsaved changes.";
+        int open = expandedTab;
+        expandedTab = -1;
         ConfigCategory.Builder category = ConfigCategory.createBuilder()
             .name(Component.literal("Tabs"))
             .tooltip(Component.literal("The tabs in the bar, left to right. DM tabs open on their own after these."));
@@ -79,7 +86,7 @@ public final class ConfigScreen {
             int index = i;
             OptionGroup.Builder group = OptionGroup.createBuilder()
                 .name(Component.literal(tab.name))
-                .collapsed(true)
+                .collapsed(i != open)
                 .option(Option.<String>createBuilder()
                     .name(Component.literal("Name"))
                     .description(OptionDescription.of(Component.literal("Shown on the tab.")))
@@ -106,27 +113,37 @@ public final class ConfigScreen {
                     .controller(opt -> CyclingListControllerBuilder.create(opt).values(SEND_TO)
                         .formatValue(c -> Component.literal(c.command == null ? "Normal chat" : c.label + " (/" + c.command + ")")))
                     .build())
-                .option(button("Move left", "Move", "Moves this tab one place to the left." + saveFirst, () -> {
-                    if (index > 0) Collections.swap(tabs, index, index - 1);
-                }, reopen))
-                .option(button("Move right", "Move", "Moves this tab one place to the right." + saveFirst, () -> {
-                    if (index < tabs.size() - 1) Collections.swap(tabs, index, index + 1);
-                }, reopen))
-                .option(button("Delete tab", "Delete", "Removes this tab. The last tab can't be deleted." + saveFirst, () -> {
-                    if (tabs.size() > 1) tabs.remove(index);
-                }, reopen));
+                .option(button("Move left", "Move", "Moves this tab one place to the left.", parent, TABS_CATEGORY, () -> {
+                    if (index == 0) return index;
+                    Collections.swap(tabs, index, index - 1);
+                    return index - 1;
+                }))
+                .option(button("Move right", "Move", "Moves this tab one place to the right.", parent, TABS_CATEGORY, () -> {
+                    if (index == tabs.size() - 1) return index;
+                    Collections.swap(tabs, index, index + 1);
+                    return index + 1;
+                }))
+                .option(button("Delete tab", "Delete", "Removes this tab. The last tab can't be deleted.", parent,
+                    TABS_CATEGORY, () -> {
+                        if (tabs.size() > 1) tabs.remove(index);
+                        return -1;
+                    }));
             category.group(group.build());
         }
         category.group(OptionGroup.createBuilder()
             .name(Component.literal("New tab"))
-            .option(button("Add tab", "Add", "Adds a tab showing every message, at the right end." + saveFirst,
-                () -> tabs.add(new Config.TabConfig("Tab " + (tabs.size() + 1), List.of(Channel.EVERYTHING),
-                    Channel.EVERYTHING)), reopen))
+            .option(button("Add tab", "Add", "Adds a tab showing every message, at the right end.", parent,
+                TABS_CATEGORY, () -> {
+                    tabs.add(new Config.TabConfig("Tab " + (tabs.size() + 1), List.of(Channel.EVERYTHING),
+                        Channel.EVERYTHING));
+                    return tabs.size() - 1;
+                }))
             .option(button("Reset tabs", "Reset", "Puts back the default tabs: General, All, Guild, Party, DMs and "
-                + "System." + saveFirst, () -> {
-                tabs.clear();
-                tabs.addAll(Config.defaultTabs());
-            }, reopen))
+                + "System.", parent, TABS_CATEGORY, () -> {
+                    tabs.clear();
+                    tabs.addAll(Config.defaultTabs());
+                    return -1;
+                }))
             .build());
         return category.build();
     }
@@ -144,7 +161,7 @@ public final class ConfigScreen {
         };
     }
 
-    private static ConfigCategory appearance(Runnable reopen) {
+    private static ConfigCategory appearance(Screen parent) {
         TabStyle s = TabStyle.get();
         TabStyle d = new TabStyle();
         List<String> fonts = TabStyle.availableFonts();
@@ -189,20 +206,37 @@ public final class ConfigScreen {
                     () -> s.boldActive, v -> s.boldActive = v))
                 .build())
             .option(button("Reset appearance", "Reset", "Puts every Appearance setting back to its default.",
-                TabStyle::reset, reopen))
+                parent, APPEARANCE_CATEGORY, () -> {
+                    TabStyle.reset();
+                    return -1;
+                }))
             .build();
     }
 
-    /** A button that changes something, saves the tabs and reopens the screen to show the result. */
-    private static ButtonOption button(String name, String text, String description, Runnable action, Runnable reopen) {
+    /**
+     * A button that changes the tab list or look. It keeps what is on screen (applies every unsaved option first, as
+     * Save would), runs {@code action}, saves, and rebuilds the screen on {@code category}. The action returns the
+     * tab section to leave open, or -1.
+     */
+    private static ButtonOption button(String name, String text, String description, Screen parent, int category,
+                                       IntSupplier action) {
         return ButtonOption.createBuilder()
             .name(Component.literal(name))
             .text(Component.literal(text))
             .description(OptionDescription.of(Component.literal(description)))
             .action((screen, button) -> {
-                action.run();
+                for (ConfigCategory c : screen.config.categories()) {
+                    for (OptionGroup g : c.groups()) {
+                        for (Option<?> o : g.options()) o.applyValue();
+                    }
+                }
+                expandedTab = action.getAsInt();
                 ChatTabs.saveConfig();
-                reopen.run();
+                TabStyle.save();
+                Screen rebuilt = create(parent);
+                Minecraft.getInstance().gui.setScreen(rebuilt);
+                // setScreen ran init(), which made the category bar.
+                if (rebuilt instanceof YACLScreen yacl) yacl.tabNavigationBar.selectTab(category, false);
             })
             .build();
     }
