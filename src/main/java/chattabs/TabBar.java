@@ -97,22 +97,27 @@ final class TabBar {
         TabStyle style = TabStyle.get();
         Font font = Minecraft.getInstance().font;
         Layout bar = layout(screen);
-        int textY = bar.y() + (bar.height() - font.lineHeight) / 2 + 1;
         int x = bar.x();
         for (int i = 0; i < bar.widths().length; i++) {
-            boolean open = i == ChatTabs.activeIndex();
             int w = bar.widths()[i];
             boolean hover = mouseX >= x && mouseX < x + w && mouseY >= bar.y() && mouseY < bar.y() + bar.height();
-            int background = open ? style.activeBackground : hover ? style.hoverBackground : style.tabBackground;
-            RoundedBox.fill(graphics, x, bar.y(), w, bar.height(), style.radius, background);
-            int border = open ? style.activeBorder : style.tabBorder;
-            for (int b = 0; b < style.borderWidth; b++) {
-                RoundedBox.outline(graphics, x + b, bar.y() + b, w - 2 * b, bar.height() - 2 * b,
-                    Math.max(0, style.radius - b), border);
-            }
-            graphics.text(font, bar.labels().get(i), x + style.padding, textY, 0xFFFFFFFF, style.textShadow);
+            drawTab(graphics, font, style, x, bar.y(), w, bar.labels().get(i), i == ChatTabs.activeIndex(), hover);
             x += w + style.gap;
         }
+    }
+
+    /** One tab: background, border and label. Also used by the Appearance preview. */
+    static void drawTab(GuiGraphicsExtractor graphics, Font font, TabStyle style, int x, int y, int w,
+                        Component label, boolean open, boolean hover) {
+        int background = open ? style.activeBackground : hover ? style.hoverBackground : style.tabBackground;
+        RoundedBox.fill(graphics, x, y, w, style.tabHeight, style.radius, background);
+        int border = open ? style.activeBorder : style.tabBorder;
+        for (int b = 0; b < style.borderWidth; b++) {
+            RoundedBox.outline(graphics, x + b, y + b, w - 2 * b, style.tabHeight - 2 * b,
+                Math.max(0, style.radius - b), border);
+        }
+        int textY = y + (style.tabHeight - font.lineHeight) / 2 + 1;
+        graphics.text(font, label, x + style.padding, textY, 0xFFFFFFFF, style.textShadow);
     }
 
     /** The tab at a point, or -1. */

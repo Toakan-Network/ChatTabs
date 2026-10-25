@@ -13,6 +13,7 @@
 - 0.1.2: the Tabs settings buttons keep unsaved edits, the category and the edited tab's section open.
 - 0.2.0: the tab bar follows the chat (`ChatFrame` reads chat's pose), positions Top / Bottom / Free with drag
   and snapping in Free.
+- 0.2.1: live preview in Settings > Appearance (draft style copy, as in CraftingTracker).
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs

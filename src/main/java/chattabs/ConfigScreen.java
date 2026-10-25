@@ -4,6 +4,7 @@ import dev.isxander.yacl3.api.ButtonOption;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
+import dev.isxander.yacl3.api.OptionEventListener;
 import dev.isxander.yacl3.api.OptionGroup;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -15,7 +16,10 @@ import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import dev.isxander.yacl3.gui.YACLScreen;
+import dev.isxander.yacl3.gui.image.ImageRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -23,10 +27,13 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.ObjIntConsumer;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 /**
  * The Settings screen, built with YetAnotherConfigLib. Options write into {@link ChatTabs#config()} and
@@ -184,48 +191,49 @@ public final class ConfigScreen {
     }
 
     private static ConfigCategory appearance(Screen parent) {
-        TabStyle s = TabStyle.get();
         TabStyle d = new TabStyle();
         List<String> fonts = TabStyle.availableFonts();
-        if (!fonts.contains(s.font)) fonts.add(s.font);
+        if (!fonts.contains(TabStyle.get().font)) fonts.add(TabStyle.get().font);
+        // The preview draws a copy that follows every unsaved change; the real look only changes on Save.
+        Look look = new Look(TabStyle.copy());
         return ConfigCategory.createBuilder()
             .name(Component.literal("Appearance"))
             .group(OptionGroup.createBuilder()
                 .name(Component.literal("Colours"))
-                .option(colour("Tab background", d.tabBackground, () -> s.tabBackground, v -> s.tabBackground = v))
-                .option(colour("Tab border", d.tabBorder, () -> s.tabBorder, v -> s.tabBorder = v))
-                .option(colour("Tab text", d.tabText, () -> s.tabText, v -> s.tabText = v))
-                .option(colour("Hovered tab background", d.hoverBackground, () -> s.hoverBackground, v -> s.hoverBackground = v))
-                .option(colour("Open tab background", d.activeBackground, () -> s.activeBackground, v -> s.activeBackground = v))
-                .option(colour("Open tab border", d.activeBorder, () -> s.activeBorder, v -> s.activeBorder = v))
-                .option(colour("Open tab text", d.activeText, () -> s.activeText, v -> s.activeText = v))
-                .option(colour("Unread tab text", d.unreadText, () -> s.unreadText, v -> s.unreadText = v))
+                .option(look.colour("Tab background", d.tabBackground, st -> st.tabBackground, (st, v) -> st.tabBackground = v))
+                .option(look.colour("Tab border", d.tabBorder, st -> st.tabBorder, (st, v) -> st.tabBorder = v))
+                .option(look.colour("Tab text", d.tabText, st -> st.tabText, (st, v) -> st.tabText = v))
+                .option(look.colour("Hovered tab background", d.hoverBackground, st -> st.hoverBackground,
+                    (st, v) -> st.hoverBackground = v))
+                .option(look.colour("Open tab background", d.activeBackground, st -> st.activeBackground,
+                    (st, v) -> st.activeBackground = v))
+                .option(look.colour("Open tab border", d.activeBorder, st -> st.activeBorder, (st, v) -> st.activeBorder = v))
+                .option(look.colour("Open tab text", d.activeText, st -> st.activeText, (st, v) -> st.activeText = v))
+                .option(look.colour("Unread tab text", d.unreadText, st -> st.unreadText, (st, v) -> st.unreadText = v))
                 .build())
             .group(OptionGroup.createBuilder()
                 .name(Component.literal("Sizes"))
-                .option(slider("Tab height", "Height of the tabs in pixels.", 10, 20, d.tabHeight,
-                    () -> s.tabHeight, v -> s.tabHeight = v))
-                .option(slider("Padding", "Space between a tab's border and its name.", 1, 12, d.padding,
-                    () -> s.padding, v -> s.padding = v))
-                .option(slider("Gap", "Space between tabs.", 0, 8, d.gap, () -> s.gap, v -> s.gap = v))
-                .option(slider("Border width", "0 draws no border.", 0, 3, d.borderWidth,
-                    () -> s.borderWidth, v -> s.borderWidth = v))
-                .option(slider("Corner radius", "0 draws square corners.", 0, 6, d.radius,
-                    () -> s.radius, v -> s.radius = v))
+                .option(look.slider("Tab height", "Height of the tabs in pixels.", 10, 20, d.tabHeight,
+                    st -> st.tabHeight, (st, v) -> st.tabHeight = v))
+                .option(look.slider("Padding", "Space between a tab's border and its name.", 1, 12, d.padding,
+                    st -> st.padding, (st, v) -> st.padding = v))
+                .option(look.slider("Gap", "Space between tabs.", 0, 8, d.gap, st -> st.gap, (st, v) -> st.gap = v))
+                .option(look.slider("Border width", "0 draws no border.", 0, 3, d.borderWidth,
+                    st -> st.borderWidth, (st, v) -> st.borderWidth = v))
+                .option(look.slider("Corner radius", "0 draws square corners.", 0, 6, d.radius,
+                    st -> st.radius, (st, v) -> st.radius = v))
                 .build())
             .group(OptionGroup.createBuilder()
                 .name(Component.literal("Text"))
-                .option(Option.<String>createBuilder()
-                    .name(Component.literal("Font"))
-                    .description(OptionDescription.of(Component.literal(
-                        "Fonts from your resource packs. Unknown fonts fall back to Minecraft's.")))
-                    .binding(d.font, () -> s.font, v -> s.font = v)
-                    .controller(opt -> DropdownStringControllerBuilder.create(opt).values(fonts))
-                    .build())
-                .option(toggle("Text shadow", "Draw tab names with a shadow.", d.textShadow,
-                    () -> s.textShadow, v -> s.textShadow = v))
-                .option(toggle("Bold open tab", "Draw the open tab's name in bold.", d.boldActive,
-                    () -> s.boldActive, v -> s.boldActive = v))
+                .option(look.finish(Option.<String>createBuilder()
+                        .name(Component.literal("Font"))
+                        .controller(opt -> DropdownStringControllerBuilder.create(opt).values(fonts)),
+                    "Fonts from your resource packs. Unknown fonts fall back to Minecraft's.",
+                    d.font, st -> st.font, (st, v) -> st.font = v))
+                .option(look.toggle("Text shadow", "Draw tab names with a shadow.", d.textShadow,
+                    st -> st.textShadow, (st, v) -> st.textShadow = v))
+                .option(look.toggle("Bold open tab", "Draw the open tab's name in bold.", d.boldActive,
+                    st -> st.boldActive, (st, v) -> st.boldActive = v))
                 .build())
             .option(button("Reset appearance", "Reset", "Puts every Appearance setting back to its default.",
                 parent, APPEARANCE_CATEGORY, () -> {
@@ -283,13 +291,83 @@ public final class ConfigScreen {
             .build();
     }
 
-    private static Option<Color> colour(String name, int def, IntSupplier getter, IntConsumer setter) {
-        return Option.<Color>createBuilder()
-            .name(Component.literal(name))
-            .description(OptionDescription.of(Component.literal(
-                "Colour and transparency of: " + name.toLowerCase(Locale.ROOT) + ".")))
-            .binding(new Color(def, true), () -> new Color(getter.getAsInt(), true), c -> setter.accept(c.getRGB()))
-            .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
-            .build();
+    /**
+     * Builds the Appearance options. Each is bound to the saved look (written on Save), copies every unsaved change
+     * to {@code draft}, and shows a preview of tabs drawn with the draft above its description.
+     */
+    private static final class Look {
+        private final TabStyle draft;
+        private final ImageRenderer preview;
+
+        Look(TabStyle draft) {
+            this.draft = draft;
+            this.preview = new ImageRenderer() {
+                @Override
+                public int render(GuiGraphicsExtractor graphics, int x, int y, int width, float delta) {
+                    return drawPreview(graphics, x, y, width, draft);
+                }
+
+                @Override
+                public void close() {
+                }
+            };
+        }
+
+        <T> Option<T> finish(Option.Builder<T> builder, String description, T def, Function<TabStyle, T> get,
+                             BiConsumer<TabStyle, T> set) {
+            TabStyle saved = TabStyle.get();
+            return builder
+                .description(OptionDescription.createBuilder().text(Component.literal(description)).customImage(preview).build())
+                .binding(def, () -> get.apply(saved), v -> set.accept(saved, v))
+                .addListener((option, event) -> {
+                    if (event == OptionEventListener.Event.STATE_CHANGE) set.accept(draft, option.pendingValue());
+                })
+                .build();
+        }
+
+        Option<Color> colour(String name, int def, ToIntFunction<TabStyle> get, ObjIntConsumer<TabStyle> set) {
+            return finish(Option.<Color>createBuilder()
+                    .name(Component.literal(name))
+                    .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)),
+                "Colour and transparency of: " + name.toLowerCase(Locale.ROOT) + ".",
+                new Color(def, true), st -> new Color(get.applyAsInt(st), true), (st, c) -> set.accept(st, c.getRGB()));
+        }
+
+        Option<Integer> slider(String name, String description, int min, int max, int def,
+                               Function<TabStyle, Integer> get, BiConsumer<TabStyle, Integer> set) {
+            return finish(Option.<Integer>createBuilder()
+                    .name(Component.literal(name))
+                    .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(min, max).step(1)),
+                description, def, get, set);
+        }
+
+        Option<Boolean> toggle(String name, String description, boolean def, Function<TabStyle, Boolean> get,
+                               BiConsumer<TabStyle, Boolean> set) {
+            return finish(Option.<Boolean>createBuilder()
+                    .name(Component.literal(name))
+                    .controller(opt -> BooleanControllerBuilder.create(opt).onOffFormatter().coloured(true)),
+                description, def, get, set);
+        }
+    }
+
+    /** Example tabs, one in each state (normal, open, unread, hovered), on a chat-like background. */
+    private static int drawPreview(GuiGraphicsExtractor graphics, int x, int y, int width, TabStyle style) {
+        Font font = Minecraft.getInstance().font;
+        int height = style.tabHeight + 8;
+        graphics.fill(x, y, x + width, y + height, 0x80000000);
+        Component[] labels = {
+            style.text("General", style.tabText, false),
+            style.text("All", style.activeText, style.boldActive),
+            style.text("Guild (3)", style.unreadText, false),
+            style.text("Party", style.tabText, false),
+        };
+        int tabX = x + 4;
+        for (int i = 0; i < labels.length; i++) {
+            int w = font.width(labels[i]) + 2 * style.padding;
+            if (tabX + w > x + width) break;
+            TabBar.drawTab(graphics, font, style, tabX, y + 4, w, labels[i], i == 1, i == 3);
+            tabX += w + style.gap;
+        }
+        return height;
     }
 }

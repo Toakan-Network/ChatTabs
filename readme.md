@@ -56,7 +56,8 @@ A tab you aren't looking at shows how many new messages it has, e.g. `Guild (3)`
   Add tab and Reset tabs at the bottom. These buttons save at once, along with anything else you changed.
 - **Appearance:** colours (background, border and text for normal, hovered, open and unread tabs), tab height,
   padding, gap, border width, corner radius, font (any font from your resource packs), text shadow and bold open
-  tab. The defaults are Skyblock Shopping List's look.
+  tab. The defaults are Skyblock Shopping List's look. A preview above each option's description shows example
+  tabs (normal, open, unread and hovered) with your unsaved changes.
 
 Files: `config/chat-tabs/tabs.json` and `style.json`.
 

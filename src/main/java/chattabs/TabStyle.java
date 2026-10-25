@@ -67,6 +67,13 @@ public final class TabStyle {
         JsonFiles.write(FILE, style);
     }
 
+    /** An independent copy of the active style (for the Appearance preview). */
+    public static TabStyle copy() {
+        TabStyle copy = JsonFiles.GSON.fromJson(JsonFiles.GSON.toJson(get()), TabStyle.class);
+        copy.clamp();
+        return copy;
+    }
+
     /** Puts every look setting back to its default and saves. */
     public static void reset() {
         current = new TabStyle();
