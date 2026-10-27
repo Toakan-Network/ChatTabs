@@ -78,7 +78,16 @@ public final class ChatTabs {
     public static boolean isActive() {
         if (!config.enabled) return false;
         ServerData server = Minecraft.getInstance().getCurrentServer();
-        return server != null && server.ip != null && server.ip.toLowerCase(Locale.ROOT).contains("hypixel.net");
+        return server != null && server.ip != null && isHypixel(server.ip);
+    }
+
+    /** hypixel.net or a subdomain of it, with or without a port; not just any address containing it. */
+    static boolean isHypixel(String address) {
+        String host = address.trim().toLowerCase(Locale.ROOT);
+        int colon = host.indexOf(':');
+        if (colon >= 0) host = host.substring(0, colon);
+        if (host.endsWith(".")) host = host.substring(0, host.length() - 1);
+        return host.equals("hypixel.net") || host.endsWith(".hypixel.net");
     }
 
     /** Whether the open tab shows {@code message}. */
