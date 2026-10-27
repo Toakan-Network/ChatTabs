@@ -31,6 +31,8 @@
 - 0.2.11: `inputCode` looks each mouse code up once instead of by reflection on every click.
 - 0.2.12: each message is classified once (identity map, refilled by each chat rebuild), so a tab switch no
   longer runs the patterns over the whole history (long with morechathistory).
+- 0.2.13: the tab bar keeps its labels and widths until a tab, unread count, the style or the fonts change,
+  instead of remaking them every frame while chat is closed.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs

@@ -44,6 +44,8 @@ public final class TabStyle {
     public boolean boldActive = true;
 
     private static TabStyle current;
+    /** Changes on every save and reset, so the bar knows to remake its labels. */
+    private static long version;
     /** Font id -> description, cached so drawing doesn't parse the id every frame. */
     private transient FontDescription fontDescription;
     private transient String fontDescriptionId;
@@ -64,7 +66,12 @@ public final class TabStyle {
     public static void save() {
         TabStyle style = get();
         style.clamp();
+        version++;
         JsonFiles.write(FILE, style);
+    }
+
+    static long version() {
+        return version;
     }
 
     /** An independent copy of the active style (for the Appearance preview). */

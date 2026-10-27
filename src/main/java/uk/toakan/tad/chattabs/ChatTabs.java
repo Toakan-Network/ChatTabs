@@ -29,6 +29,7 @@ public final class ChatTabs {
     /** The tabs from the settings, then the DM tabs in the order they opened. */
     private static final List<Tab> tabs = new ArrayList<>();
     private static int active;
+    private static long version;
     /** Channel per chat message, by identity (GuiMessage is a record, so equals would compare whole texts). */
     private static Map<GuiMessage, MessageClassifier.Result> classified = new IdentityHashMap<>();
     /** The map before the rebuild in progress ({@link #refreshChat}), or null. */
@@ -47,6 +48,11 @@ public final class ChatTabs {
 
     public static int activeIndex() {
         return active;
+    }
+
+    /** Changes whenever the tabs, the open tab or an unread count change, so the bar knows to remake its labels. */
+    static long version() {
+        return version;
     }
 
     static void load() {
@@ -79,6 +85,7 @@ public final class ChatTabs {
         if (config.whisperTabs) tabs.addAll(whispers.subList(Math.max(0, whispers.size() - config.maxWhisperTabs), whispers.size()));
         int found = open != null ? Tab.find(tabs, open) : -1;
         active = found >= 0 ? found : 0;
+        version++;
     }
 
     /** True on Hypixel with the mod enabled: only then do tabs filter or redirect anything. */
@@ -113,6 +120,7 @@ public final class ChatTabs {
         for (int i = 0; i < tabs.size(); i++) {
             if (i != active && tabs.get(i).shows(result)) tabs.get(i).unread++;
         }
+        version++;
         return tabs.get(active).shows(result);
     }
 
@@ -144,6 +152,7 @@ public final class ChatTabs {
         if (index < 0 || index >= tabs.size()) return;
         active = index;
         tabs.get(index).unread = 0;
+        version++;
         refreshChat();
     }
 
@@ -153,6 +162,7 @@ public final class ChatTabs {
         tabs.remove(index);
         if (index < active) active--;
         else if (index == active) active = 0;
+        version++;
         refreshChat();
     }
 
@@ -178,6 +188,7 @@ public final class ChatTabs {
         tabs.removeIf(t -> t.whisperWith != null);
         for (Tab tab : tabs) tab.unread = 0;
         active = Math.clamp(active, 0, tabs.size() - 1);
+        version++;
         refreshChat();
     }
 

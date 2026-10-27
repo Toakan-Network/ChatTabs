@@ -106,17 +106,42 @@ final class TabBar {
         return layout(screen.width, screen.height);
     }
 
-    private static Layout layout(int screenWidth, int screenHeight) {
-        TabStyle style = TabStyle.get();
+    /** Each tab's label and width, remade only when {@link LabelsKey} changes (the closed bar draws every frame). */
+    private record Labels(List<Component> labels, int[] widths) {}
+
+    private record LabelsKey(long tabs, TabStyle style, long styleVersion, int fonts) {}
+
+    private static Labels labels;
+    private static LabelsKey labelsKey;
+    /** Changes on every font reload: widths may differ. */
+    private static int fontGeneration;
+
+    static void fontsReloaded() {
+        fontGeneration++;
+    }
+
+    private static Labels labels(TabStyle style) {
+        LabelsKey key = new LabelsKey(ChatTabs.version(), style, TabStyle.version(), fontGeneration);
+        if (labels != null && key.equals(labelsKey)) return labels;
         Font font = Minecraft.getInstance().font;
         List<Tab> tabs = ChatTabs.tabs();
-        List<Component> labels = new ArrayList<>(tabs.size());
+        List<Component> made = new ArrayList<>(tabs.size());
         int[] widths = new int[tabs.size()];
         for (int i = 0; i < tabs.size(); i++) {
             Component label = label(tabs.get(i), i == ChatTabs.activeIndex(), style);
-            labels.add(label);
+            made.add(label);
             widths[i] = font.width(label) + 2 * style.padding;
         }
+        labels = new Labels(List.copyOf(made), widths);
+        labelsKey = key;
+        return labels;
+    }
+
+    private static Layout layout(int screenWidth, int screenHeight) {
+        TabStyle style = TabStyle.get();
+        Labels made = labels(style);
+        List<Component> labels = made.labels();
+        int[] widths = made.widths();
         ChatFrame.Box chat = ChatFrame.bounds(screenHeight);
         float scale = chat.scale();
         Layout sized = new Layout(0, 0, scale, style.tabHeight, labels, widths);
