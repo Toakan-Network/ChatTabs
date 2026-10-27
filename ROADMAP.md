@@ -26,6 +26,7 @@
   typed chat could go to another tab's channel). Found by its settings entry (`Tab.find`, `TabTest`).
 - 0.2.8: the chat box length is vanilla's 256 less the open tab's prefix (`/gc `, `/msg <name> `), so a sent
   command is never longer than a typed one (`ChatTabs.inputLimit`, set from `TabBar` when it changes).
+- 0.2.9: a new DM no longer opens a tab past the limit when the only DM tab that could close is the open one.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs

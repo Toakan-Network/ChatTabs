@@ -109,13 +109,17 @@ public final class ChatTabs {
             open++;
         }
         if (open >= config.maxWhisperTabs) {
+            boolean closed = false;
             for (int i = 0; i < tabs.size(); i++) {
                 if (tabs.get(i).whisperWith != null && i != active) {
                     tabs.remove(i);
                     if (i < active) active--;
+                    closed = true;
                     break;
                 }
             }
+            // Only the open DM tab could close: keep it rather than go over the limit (the DMs tab still shows it).
+            if (!closed) return;
         }
         tabs.add(Tab.whisper(player));
     }
