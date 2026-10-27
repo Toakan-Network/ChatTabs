@@ -30,7 +30,9 @@ A message shows in every tab that matches it. Channels are read from Hypixel's p
 - **System** everything else (NPCs, server and game messages)
 - **Everything** every message
 
-Commands you type (starting with `/`) are always sent as they are.
+Commands you type (starting with `/`) are always sent as they are. In a channel or DM tab the chat box holds a few
+characters less (the length of `/gc ` or `/msg <name> `), so the message sent is never longer than typing the
+command yourself.
 
 ## Tab bar position
 The tab bar sticks to the chat window, also when a mod such as [Huddable](https://modrinth.com/mod/huddable)

@@ -24,6 +24,8 @@
 - 0.2.5: Lock tab bar (Settings > General, off by default): a locked Free bar only opens tabs, never drags.
 - 0.2.7: the open tab stays open when tabs are deleted, moved or edited in Settings (it was kept by position, so
   typed chat could go to another tab's channel). Found by its settings entry (`Tab.find`, `TabTest`).
+- 0.2.8: the chat box length is vanilla's 256 less the open tab's prefix (`/gc `, `/msg <name> `), so a sent
+  command is never longer than a typed one (`ChatTabs.inputLimit`, set from `TabBar` when it changes).
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs

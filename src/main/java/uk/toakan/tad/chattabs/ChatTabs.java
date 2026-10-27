@@ -20,6 +20,8 @@ import java.util.Locale;
 public final class ChatTabs {
     static final File CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("chat-tabs").toFile();
     private static final File CONFIG_FILE = new File(CONFIG_DIR, "tabs.json");
+    /** Vanilla's chat box length ({@code ChatScreen.init}), for chat and typed commands alike. */
+    static final int CHAT_LIMIT = 256;
 
     private static Config config = new Config();
     /** The tabs from the settings, then the DM tabs in the order they opened. */
@@ -137,6 +139,17 @@ public final class ChatTabs {
     /** The command (without the slash) that sends typed chat from the open tab, or null to send it as is. */
     public static @Nullable String commandFor(String message) {
         return isActive() ? tabs.get(active).command(message) : null;
+    }
+
+    /**
+     * Most characters the chat box may hold: vanilla's {@link #CHAT_LIMIT}, less the open tab's prefix ("/gc ",
+     * "/msg Name "), so what a tab sends is never longer than typing the command yourself. A typed command keeps
+     * the full limit.
+     */
+    public static int inputLimit(String typed) {
+        if (!isActive() || typed.startsWith("/")) return CHAT_LIMIT;
+        String command = tabs.get(active).command("");
+        return command == null ? CHAT_LIMIT : CHAT_LIMIT - 1 - command.length();
     }
 
     /** A new connection: DM tabs and unread counts start over. */

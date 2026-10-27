@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -58,6 +59,8 @@ final class TabBar {
     private static double pressY;
     private static int startX;
     private static int startY;
+    /** The chat box length last set on the open chat screen. */
+    private static int inputLimit = ChatTabs.CHAT_LIMIT;
 
     private TabBar() {}
 
@@ -66,6 +69,9 @@ final class TabBar {
             if (!(screen instanceof ChatScreen chat)) return;
             pressed = false;
             dragging = false;
+            // init() just set vanilla's length.
+            inputLimit = ChatTabs.CHAT_LIMIT;
+            limitInput(chat);
             ScreenEvents.afterExtract(screen).register((s, graphics, mouseX, mouseY, delta) -> draw(chat, graphics, mouseX, mouseY));
             ScreenMouseEvents.allowMouseClick(screen).register((s, event) -> !click(chat, event));
             ScreenMouseEvents.allowMouseDrag(screen).register((s, event, dx, dy) -> !drag(chat, event));
@@ -77,6 +83,16 @@ final class TabBar {
             if (!ChatTabs.isActive() || !ChatTabs.config().showBarClosed || mc.gui.screen() instanceof ChatScreen) return;
             drawBar(graphics, layout(graphics.guiWidth(), graphics.guiHeight()), -1, -1);
         });
+    }
+
+    /** Keeps the chat box's length to what the open tab can send ({@link ChatTabs#inputLimit}); set only on change. */
+    private static void limitInput(ChatScreen screen) {
+        EditBox input = ((ChatScreenAccessor) screen).chattabs$input();
+        int limit = ChatTabs.inputLimit(input.getValue());
+        if (limit != inputLimit) {
+            inputLimit = limit;
+            input.setMaxLength(limit);
+        }
     }
 
     /** Hidden off Hypixel, and at the bottom while a command is typed so its suggestions aren't covered. */
@@ -122,6 +138,7 @@ final class TabBar {
     }
 
     private static void draw(ChatScreen screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        limitInput(screen);
         if (hidden(screen)) return;
         drawBar(graphics, layout(screen), mouseX, mouseY);
     }
