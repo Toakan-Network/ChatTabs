@@ -33,6 +33,8 @@
   longer runs the patterns over the whole history (long with morechathistory).
 - 0.2.13: the tab bar keeps its labels and widths until a tab, unread count, the style or the fonts change,
   instead of remaking them every frame while chat is closed.
+- 0.2.14: settings and style save on a background writer (`JsonFiles` from Huddable/Shopping List), flushed
+  when the game closes; a bar drag no longer writes the file on the game thread.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs

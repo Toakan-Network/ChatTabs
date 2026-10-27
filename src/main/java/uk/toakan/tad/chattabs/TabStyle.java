@@ -67,7 +67,8 @@ public final class TabStyle {
         TabStyle style = get();
         style.clamp();
         version++;
-        JsonFiles.write(FILE, style);
+        TabStyle saved = copy();
+        JsonFiles.writeAsync(FILE, () -> saved);
     }
 
     static long version() {

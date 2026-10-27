@@ -72,7 +72,9 @@ public final class ChatTabs {
     /** Saves the settings file only, for changes that don't touch the tabs (the dragged bar position). */
     static void writeConfig() {
         config.sanitize();
-        JsonFiles.write(CONFIG_FILE, config);
+        // Written on the writer thread from a copy, so the game never waits on the disk (a bar drag ends here).
+        Config copy = JsonFiles.GSON.fromJson(JsonFiles.GSON.toJson(config), Config.class);
+        JsonFiles.writeAsync(CONFIG_FILE, () -> copy);
     }
 
     private static void rebuildTabs() {
