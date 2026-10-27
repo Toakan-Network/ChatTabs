@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,23 +19,34 @@ import java.util.List;
 /**
  * The row of tabs on the chat screen, stuck to the chat wherever it is ({@link ChatFrame}): above it, under it, or
  * at a dragged offset from it (Free). Left click opens a tab, right click closes a DM tab, and in Free a left drag
- * moves the bar, snapping to the chat's and the screen's edges. While chat is closed the same bar is drawn on the
- * HUD (Settings > General), without clicks, so unread counts show.
+ * moves the bar, snapping to the chat's and the screen's edges. The bar is drawn at chat's scale, so it keeps the
+ * chat's size through vanilla Chat Scale and any mod scaling chat (Huddable). While chat is closed the same bar is
+ * drawn with vanilla's chat HUD element (Settings > General), without clicks, so unread counts show. It is part of
+ * that element rather than a layer of its own, so a HUD mover doesn't move or scale it a second time.
  */
 final class TabBar {
     /** The bar's bottom never goes below this distance from the screen bottom (the input box is under it). */
     private static final int INPUT_CLEARANCE = 15;
     /** How far (GUI pixels) a press must move before it drags the bar rather than clicking a tab. */
     private static final int DRAG_THRESHOLD = 3;
-    /** The HUD layer for the bar while chat is closed, drawn right after vanilla's chat. */
-    private static final Identifier HUD_LAYER = Identifier.fromNamespaceAndPath(ChatTabsClient.MOD_ID, "tab_bar");
-
-    /** Where the bar is this frame: its top-left corner and each tab's label and width. */
-    private record Layout(int x, int y, int height, List<Component> labels, int[] widths) {
+    /**
+     * Where the bar is this frame: its top-left corner on screen, the scale it is drawn at, and each tab's label and
+     * width. Widths and height are in the bar's own pixels, before the scale.
+     */
+    private record Layout(int x, int y, float scale, int height, List<Component> labels, int[] widths) {
         int width(int gap) {
             int total = 0;
             for (int w : widths) total += w;
             return total + gap * Math.max(0, widths.length - 1);
+        }
+
+        /** A screen x in the bar's own pixels, from its left edge. */
+        double localX(double screenX) {
+            return (screenX - x) / scale;
+        }
+
+        double localY(double screenY) {
+            return (screenY - y) / scale;
         }
     }
 
@@ -60,7 +71,8 @@ final class TabBar {
             ScreenMouseEvents.allowMouseDrag(screen).register((s, event, dx, dy) -> !drag(chat, event));
             ScreenMouseEvents.allowMouseRelease(screen).register((s, event) -> !release());
         });
-        HudElementRegistry.attachElementAfter(VanillaHudElements.CHAT, HUD_LAYER, (graphics, delta) -> {
+        HudElementRegistry.replaceElement(VanillaHudElements.CHAT, original -> (graphics, delta) -> {
+            original.extractRenderState(graphics, delta);
             Minecraft mc = Minecraft.getInstance();
             if (!ChatTabs.isActive() || !ChatTabs.config().showBarClosed || mc.gui.screen() instanceof ChatScreen) return;
             drawBar(graphics, layout(graphics.guiWidth(), graphics.guiHeight()), -1, -1);
@@ -89,22 +101,24 @@ final class TabBar {
             labels.add(label);
             widths[i] = font.width(label) + 2 * style.padding;
         }
-        Layout sized = new Layout(0, 0, style.tabHeight, labels, widths);
-        int barWidth = sized.width(style.gap);
-        Config config = ChatTabs.config();
         ChatFrame.Box chat = ChatFrame.bounds(screenHeight);
+        float scale = chat.scale();
+        Layout sized = new Layout(0, 0, scale, style.tabHeight, labels, widths);
+        int barWidth = Math.round(sized.width(style.gap) * scale);
+        int barHeight = Math.round(style.tabHeight * scale);
+        Config config = ChatTabs.config();
         int x = chat.left();
         int y = switch (config.barPosition) {
-            case TOP -> chat.top() - 1 - style.tabHeight;
-            case BOTTOM -> Math.min(chat.bottom() + 1, screenHeight - INPUT_CLEARANCE - style.tabHeight);
+            case TOP -> chat.top() - 1 - barHeight;
+            case BOTTOM -> Math.min(chat.bottom() + 1, screenHeight - INPUT_CLEARANCE - barHeight);
             case FREE -> {
                 x = chat.left() + config.freeX;
                 yield chat.top() + config.freeY;
             }
         };
         x = Math.clamp(x, 0, Math.max(0, screenWidth - barWidth));
-        y = Math.clamp(y, 0, Math.max(0, screenHeight - style.tabHeight));
-        return new Layout(x, y, style.tabHeight, labels, widths);
+        y = Math.clamp(y, 0, Math.max(0, screenHeight - barHeight));
+        return new Layout(x, y, scale, style.tabHeight, labels, widths);
     }
 
     private static void draw(ChatScreen screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
@@ -112,17 +126,22 @@ final class TabBar {
         drawBar(graphics, layout(screen), mouseX, mouseY);
     }
 
-    /** Every tab of {@code bar}; the one under the mouse is drawn hovered. */
+    /** Every tab of {@code bar}, at its scale; the one under the mouse is drawn hovered. */
     private static void drawBar(GuiGraphicsExtractor graphics, Layout bar, int mouseX, int mouseY) {
         TabStyle style = TabStyle.get();
         Font font = Minecraft.getInstance().font;
-        int x = bar.x();
+        int hovered = tabAt(bar, mouseX, mouseY);
+        Matrix3x2fStack pose = graphics.pose();
+        pose.pushMatrix();
+        pose.translate(bar.x(), bar.y());
+        pose.scale(bar.scale(), bar.scale());
+        int x = 0;
         for (int i = 0; i < bar.widths().length; i++) {
             int w = bar.widths()[i];
-            boolean hover = mouseX >= x && mouseX < x + w && mouseY >= bar.y() && mouseY < bar.y() + bar.height();
-            drawTab(graphics, font, style, x, bar.y(), w, bar.labels().get(i), i == ChatTabs.activeIndex(), hover);
+            drawTab(graphics, font, style, x, 0, w, bar.labels().get(i), i == ChatTabs.activeIndex(), i == hovered);
             x += w + style.gap;
         }
+        pose.popMatrix();
     }
 
     /** One tab: background, border and label. Also used by the Appearance preview. */
@@ -141,11 +160,13 @@ final class TabBar {
 
     /** The tab at a point, or -1. */
     private static int tabAt(Layout bar, double mouseX, double mouseY) {
-        if (mouseY < bar.y() || mouseY >= bar.y() + bar.height()) return -1;
+        double localX = bar.localX(mouseX);
+        double localY = bar.localY(mouseY);
+        if (localY < 0 || localY >= bar.height()) return -1;
         int gap = TabStyle.get().gap;
-        int x = bar.x();
+        int x = 0;
         for (int i = 0; i < bar.widths().length; i++) {
-            if (mouseX >= x && mouseX < x + bar.widths()[i]) return i;
+            if (localX >= x && localX < x + bar.widths()[i]) return i;
             x += bar.widths()[i] + gap;
         }
         return -1;
@@ -184,12 +205,14 @@ final class TabBar {
         if (!dragging && Math.abs(moveX) + Math.abs(moveY) <= DRAG_THRESHOLD) return true;
         dragging = true;
         TabStyle style = TabStyle.get();
-        int barWidth = layout(screen).width(style.gap);
+        Layout bar = layout(screen);
+        int barWidth = Math.round(bar.width(style.gap) * bar.scale());
+        int barHeight = Math.round(bar.height() * bar.scale());
         ChatFrame.Box chat = ChatFrame.bounds(screen.height);
         int[] linesX = {0, screen.width, chat.left(), chat.right(), (chat.left() + chat.right()) / 2};
         int[] linesY = {0, screen.height, chat.top(), chat.bottom()};
         int x = PanelSnap.snap((int) Math.round(startX + moveX), barWidth, linesX).pos();
-        int y = PanelSnap.snap((int) Math.round(startY + moveY), style.tabHeight, linesY).pos();
+        int y = PanelSnap.snap((int) Math.round(startY + moveY), barHeight, linesY).pos();
         Config config = ChatTabs.config();
         config.freeX = x - chat.left();
         config.freeY = y - chat.top();

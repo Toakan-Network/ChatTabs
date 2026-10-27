@@ -34,7 +34,7 @@ Commands you type (starting with `/`) are always sent as they are.
 
 ## Tab bar position
 The tab bar sticks to the chat window, also when a mod such as [Huddable](https://modrinth.com/mod/huddable)
-moves or scales the chat. Pick where in Settings > General > Tab bar:
+moves or scales the chat, and grows or shrinks with it (vanilla Chat Scale, Huddable's chat scale and sizing). Pick where in Settings > General > Tab bar:
 
 - **Bottom** (default): under the chat, above the input box. Steps aside while you type a command.
 - **Top:** above the chat.
@@ -43,7 +43,7 @@ moves or scales the chat. Pick where in Settings > General > Tab bar:
   tab. Reset free position puts the bar back just above the chat. Once it's where you want it, turn on
   Settings > General > Lock tab bar so a click can't drag it by accident.
 
-The tab bar also stays on screen while chat is closed, in the same spot, so you can see unread counts while you
+The tab bar also stays on screen while chat is closed, in the same spot and size, so you can see unread counts while you
 play. Open chat to click a tab. Turn it off with Settings > General > Tabs while chat is closed.
 
 ## DM tabs

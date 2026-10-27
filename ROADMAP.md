@@ -18,6 +18,9 @@
 - 0.2.3: the tab bar shows on the HUD while chat is closed (Settings > General > Tabs while chat is closed, on by
   default): a Fabric HUD layer after vanilla's chat. `ChatFrame` now records closed chat too and always uses the
   open chat's height, so the bar doesn't move when chat opens.
+- 0.2.6: the tab bar draws at chat's scale (vanilla Chat Scale, Huddable chat scale and sizing), open or closed.
+  The closed bar is drawn with vanilla's CHAT HUD element instead of its own `chat-tabs:tab_bar` layer, which
+  Huddable scaled a second time (bar changed size when chat opened with Huddable sizing Window).
 - 0.2.5: Lock tab bar (Settings > General, off by default): a locked Free bar only opens tabs, never drags.
 
 ## Untested in game
@@ -32,8 +35,8 @@
 - Together with compacting (`(x2)` merging across tab switches), morechathistory (long history) and
   beautifiedchatclient (does it change the prefixes?).
 - `ChatScreenMixin` applies when the chat screen first opens; not yet exercised.
-- 0.2.3 closed-chat bar: Huddable lists it as its own layer (`chat-tabs:tab_bar`); moving it there adds an offset on
-  top of following chat. Top placement with a short unfocused chat height.
+- 0.2.6 bar at chat's scale: same size open and closed with Huddable sizing Window; clicks and the Free drag when
+  scaled. Top placement with a short unfocused chat height.
 - 26.3 in a real client.
 
 ## Next

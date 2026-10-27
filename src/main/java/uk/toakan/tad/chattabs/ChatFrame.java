@@ -10,10 +10,11 @@ import org.joml.Vector2f;
  * Where the open chat is on screen, so the tab bar can stick to it. Read from the pose chat is drawn with (see
  * {@code ChatComponentMixin}), so it follows any mod that moves or scales chat, such as Huddable. Closed chat is
  * drawn with the same pose, and the box always has the open chat's height, so the bar stays put when chat opens.
+ * The box also carries chat's scale on screen (vanilla Chat Scale times any mod's), so the bar can match its size.
  */
 public final class ChatFrame {
-    /** A box in screen (GUI) pixels. */
-    public record Box(int left, int top, int right, int bottom) {
+    /** A box in screen (GUI) pixels, and how much chat is scaled on screen. */
+    public record Box(int left, int top, int right, int bottom, float scale) {
         public int width() {
             return right - left;
         }
@@ -51,7 +52,7 @@ public final class ChatFrame {
 
     /**
      * The chat box as ChatComponent lays it out in its own coordinates (x from -4 to its width + 8, the page of
-     * lines above {@code (screenHeight - 40) / scale}), mapped through {@code pose}.
+     * lines above {@code (screenHeight - 40) / scale}), mapped through {@code pose}. Its scale is the pose's.
      */
     static Box box(Matrix3x2f pose, double scale, int chatWidth, int entryHeight, int lines, int screenHeight) {
         int maxWidth = (int) Math.ceil(chatWidth / scale);
@@ -60,6 +61,6 @@ public final class ChatFrame {
         Vector2f a = pose.transformPosition(-4, top, new Vector2f());
         Vector2f b = pose.transformPosition(maxWidth + 8, bottom, new Vector2f());
         return new Box(Math.round(Math.min(a.x, b.x)), Math.round(Math.min(a.y, b.y)),
-            Math.round(Math.max(a.x, b.x)), Math.round(Math.max(a.y, b.y)));
+            Math.round(Math.max(a.x, b.x)), Math.round(Math.max(a.y, b.y)), (float) Math.hypot(pose.m00(), pose.m01()));
     }
 }

@@ -30,8 +30,11 @@ update it in the same commit when a step lands or an issue is found or fixed.
 - Tab bar: Fabric `ScreenEvents.afterExtract` and `ScreenMouseEvents` (click, drag, release) on `ChatScreen`.
   It sticks to the chat box from `ChatFrame`, which `ChatComponentMixin` records from the pose right after vanilla's
   one `updatePose` call in `extractRenderState`. Any chat mover (Huddable) changes the pose before that, so no
-  Huddable code or dependency is needed. Top / Bottom / Free (`Config.barPosition`, Free is an offset from the
-  chat's top-left, snapping via `PanelSnap` copied from Huddable). Bottom hides while a `/` command is typed.
+  Huddable code or dependency is needed. The bar draws at chat's pose scale (`ChatFrame.Box.scale`), so it keeps
+  chat's size. The closed-chat bar is drawn inside vanilla's CHAT element (`replaceElement`), not a layer of its own:
+  Huddable would wrap a separate layer and scale it a second time. Top / Bottom / Free (`Config.barPosition`, Free
+  is an offset from the chat's top-left, snapping via `PanelSnap` copied from Huddable). Bottom hides while a `/`
+  command is typed.
 - Look: `TabStyle` (style.json) is Skyblock Shopping List's `HudStyle` cut down to the tab bar, with its palette as
   defaults, and `RoundedBox` is copied from it. Keep option names and clamps in step with Shopping List.
 - Dependencies: Fabric API and YACL (Settings). Mod Menu optional; only `compat.ModMenuCompat` touches it.

@@ -15,7 +15,7 @@ class ChatFrameTest {
     void vanillaPositionAtFullScale() {
         // 320 wide, 10 lines of 9 px, screen 240 high: chat bottom at 200.
         ChatFrame.Box box = ChatFrame.box(vanilla(1), 1.0, 320, 9, 10, 240);
-        assertEquals(new ChatFrame.Box(0, 110, 332, 200), box);
+        assertEquals(new ChatFrame.Box(0, 110, 332, 200, 1f), box);
     }
 
     @Test
@@ -25,6 +25,14 @@ class ChatFrameTest {
         assertEquals(200, box.bottom());
         assertEquals(155, box.top());
         assertEquals(326, box.right());
+        assertEquals(0.5f, box.scale(), 1e-6);
+    }
+
+    @Test
+    void takesAModsScaleOnTopOfVanillas() {
+        // A mod scaling chat 1.5x (as Huddable's sizing does) before vanilla's own scaling.
+        Matrix3x2f pose = new Matrix3x2f().scale(1.5f, 1.5f).scale(1, 1).translate(4, 0);
+        assertEquals(1.5f, ChatFrame.box(pose, 1.0, 320, 9, 10, 240).scale(), 1e-6);
     }
 
     @Test
@@ -32,6 +40,6 @@ class ChatFrameTest {
         // A mod moving chat 100 right and 50 up before vanilla's scaling.
         Matrix3x2f pose = new Matrix3x2f().translate(100, -50).scale(1, 1).translate(4, 0);
         ChatFrame.Box box = ChatFrame.box(pose, 1.0, 320, 9, 10, 240);
-        assertEquals(new ChatFrame.Box(100, 60, 432, 150), box);
+        assertEquals(new ChatFrame.Box(100, 60, 432, 150, 1f), box);
     }
 }
