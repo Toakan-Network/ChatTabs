@@ -22,6 +22,8 @@
   The closed bar is drawn with vanilla's CHAT HUD element instead of its own `chat-tabs:tab_bar` layer, which
   Huddable scaled a second time (bar changed size when chat opened with Huddable sizing Window).
 - 0.2.5: Lock tab bar (Settings > General, off by default): a locked Free bar only opens tabs, never drags.
+- 0.2.7: the open tab stays open when tabs are deleted, moved or edited in Settings (it was kept by position, so
+  typed chat could go to another tab's channel). Found by its settings entry (`Tab.find`, `TabTest`).
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs

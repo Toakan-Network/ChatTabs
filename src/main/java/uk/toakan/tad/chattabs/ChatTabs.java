@@ -61,11 +61,15 @@ public final class ChatTabs {
     }
 
     private static void rebuildTabs() {
+        // The open tab stays open by what it is, not where it was: deleting or moving a tab before it in Settings
+        // must not switch the player to another tab (and so another channel to send to).
+        Tab open = active < tabs.size() ? tabs.get(active) : null;
         List<Tab> whispers = tabs.stream().filter(t -> t.whisperWith != null).toList();
         tabs.clear();
         for (Config.TabConfig t : config.tabs) tabs.add(Tab.of(t));
         if (config.whisperTabs) tabs.addAll(whispers.subList(Math.max(0, whispers.size() - config.maxWhisperTabs), whispers.size()));
-        active = Math.clamp(active, 0, tabs.size() - 1);
+        int found = open != null ? Tab.find(tabs, open) : -1;
+        active = found >= 0 ? found : 0;
     }
 
     /** True on Hypixel with the mod enabled: only then do tabs filter or redirect anything. */
