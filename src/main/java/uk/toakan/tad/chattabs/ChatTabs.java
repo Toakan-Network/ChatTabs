@@ -9,8 +9,10 @@ import org.jspecify.annotations.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * The tabs and which one is open. Every message stays in vanilla's chat history; the open tab only decides which
@@ -27,6 +29,11 @@ public final class ChatTabs {
     /** The tabs from the settings, then the DM tabs in the order they opened. */
     private static final List<Tab> tabs = new ArrayList<>();
     private static int active;
+    /** Channel per chat message, by identity (GuiMessage is a record, so equals would compare whole texts). */
+    private static Map<GuiMessage, MessageClassifier.Result> classified = new IdentityHashMap<>();
+    /** The map before the rebuild in progress ({@link #refreshChat}), or null. */
+    private static Map<GuiMessage, MessageClassifier.Result> previousClassified;
+    private static final int MAX_CLASSIFIED = 4096;
 
     private ChatTabs() {}
 
@@ -174,12 +181,29 @@ public final class ChatTabs {
         refreshChat();
     }
 
-    /** Redraws the chat for the open tab, from the top. */
+    /**
+     * Redraws the chat for the open tab, from the top. The rebuild passes every message in the history, so it
+     * refills a fresh classification map: messages vanilla dropped from the history drop out of it too.
+     */
     private static void refreshChat() {
-        Minecraft.getInstance().gui.hud.getChat().rescaleChat();
+        previousClassified = classified;
+        classified = new IdentityHashMap<>();
+        try {
+            Minecraft.getInstance().gui.hud.getChat().rescaleChat();
+        } finally {
+            previousClassified = null;
+        }
     }
 
+    /** The message's channel, classified once: a tab switch then doesn't run the patterns over the whole history. */
     private static MessageClassifier.Result classify(GuiMessage message) {
-        return MessageClassifier.classify(message.content().getString());
+        MessageClassifier.Result result = classified.get(message);
+        if (result != null) return result;
+        if (previousClassified != null) result = previousClassified.get(message);
+        if (result == null) result = MessageClassifier.classify(message.content().getString());
+        // Between rebuilds only new messages are added; a long session without one is cut back here.
+        if (classified.size() >= MAX_CLASSIFIED) classified.clear();
+        classified.put(message, result);
+        return result;
     }
 }

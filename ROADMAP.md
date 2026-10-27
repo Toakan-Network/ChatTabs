@@ -29,6 +29,8 @@
 - 0.2.9: a new DM no longer opens a tab past the limit when the only DM tab that could close is the open one.
 - 0.2.10: Hypixel is hypixel.net or a subdomain (port allowed), not any address containing "hypixel.net".
 - 0.2.11: `inputCode` looks each mouse code up once instead of by reflection on every click.
+- 0.2.12: each message is classified once (identity map, refilled by each chat rebuild), so a tab switch no
+  longer runs the patterns over the whole history (long with morechathistory).
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs
