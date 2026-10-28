@@ -35,6 +35,8 @@
   instead of remaking them every frame while chat is closed.
 - 0.2.14: settings and style save on a background writer (`JsonFiles` from Huddable/Shopping List), flushed
   when the game closes; a bar drag no longer writes the file on the game thread.
+- 0.2.15: Appearance > Scale: Tab bar scale (50-300%) and Tab bar sizing (Match chat by default, or Shopping
+  List's Window size / GUI Scale / Fixed pixels), `TabStyle.hudScale` / `sizing` / `scaleFactor`.
 
 ## Untested in game
 - Everything on Hypixel. Formats not seen in the live logs yet: `Officer >`, `Party >`, `Co-op >`, `From`/`To` DMs
@@ -50,6 +52,7 @@
 - `ChatScreenMixin` applies when the chat screen first opens; not yet exercised.
 - 0.2.6 bar at chat's scale: same size open and closed with Huddable sizing Window; clicks and the Free drag when
   scaled. Top placement with a short unfocused chat height.
+- 0.2.15 bar scale and sizing: each mode open and closed, clicks and the Free drag at a non-100% scale.
 - 26.3 in a real client.
 
 ## Next

@@ -215,6 +215,22 @@ public final class ConfigScreen {
                     (st, v) -> st.unreadText = v))
                 .build())
             .group(OptionGroup.createBuilder()
+                .name(Component.translatable("chat-tabs.config.appearance.size"))
+                .option(look.slider("chat-tabs.config.appearance.hud_scale", 50, 300, d.hudScale,
+                    st -> st.hudScale, (st, v) -> st.hudScale = v))
+                .option(look.finish(Option.<TabStyle.Sizing>createBuilder()
+                        .name(Component.translatable("chat-tabs.config.appearance.sizing"))
+                        .controller(opt -> EnumControllerBuilder.create(opt).enumClass(TabStyle.Sizing.class)
+                            .formatValue(v -> Component.translatable(switch (v) {
+                                case CHAT -> "chat-tabs.config.appearance.sizing.chat";
+                                case WINDOW -> "chat-tabs.config.appearance.sizing.window";
+                                case GUI_SCALE -> "chat-tabs.config.appearance.sizing.gui_scale";
+                                case FIXED -> "chat-tabs.config.appearance.sizing.fixed";
+                            }))),
+                    Component.translatable("chat-tabs.config.appearance.sizing.desc"),
+                    d.sizing, st -> st.sizing, (st, v) -> st.sizing = v))
+                .build())
+            .group(OptionGroup.createBuilder()
                 .name(Component.translatable("chat-tabs.config.appearance.sizes"))
                 .option(look.slider("chat-tabs.config.appearance.tab_height", 10, 20, d.tabHeight,
                     st -> st.tabHeight, (st, v) -> st.tabHeight = v))

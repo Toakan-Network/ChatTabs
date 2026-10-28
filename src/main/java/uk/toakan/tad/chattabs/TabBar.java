@@ -20,8 +20,9 @@ import java.util.List;
 /**
  * The row of tabs on the chat screen, stuck to the chat wherever it is ({@link ChatFrame}): above it, under it, or
  * at a dragged offset from it (Free). Left click opens a tab, right click closes a DM tab, and in Free a left drag
- * moves the bar, snapping to the chat's and the screen's edges. The bar is drawn at chat's scale, so it keeps the
- * chat's size through vanilla Chat Scale and any mod scaling chat (Huddable). While chat is closed the same bar is
+ * moves the bar, snapping to the chat's and the screen's edges. By default the bar is drawn at chat's scale, so it
+ * keeps the chat's size through vanilla Chat Scale and any mod scaling chat (Huddable); Appearance > Size can
+ * shrink or grow it, or size it like Shopping List's HUD instead ({@link TabStyle#scaleFactor}). While chat is closed the same bar is
  * drawn with vanilla's chat HUD element (Settings > General), without clicks, so unread counts show. It is part of
  * that element rather than a layer of its own, so a HUD mover doesn't move or scale it a second time.
  */
@@ -143,7 +144,7 @@ final class TabBar {
         List<Component> labels = made.labels();
         int[] widths = made.widths();
         ChatFrame.Box chat = ChatFrame.bounds(screenHeight);
-        float scale = chat.scale();
+        float scale = style.scaleFactor(chat.scale());
         Layout sized = new Layout(0, 0, scale, style.tabHeight, labels, widths);
         int barWidth = Math.round(sized.width(style.gap) * scale);
         int barHeight = Math.round(style.tabHeight * scale);

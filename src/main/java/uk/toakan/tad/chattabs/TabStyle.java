@@ -1,5 +1,6 @@
 package uk.toakan.tad.chattabs;
 
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
@@ -29,6 +30,16 @@ public final class TabStyle {
     public int activeText = 0xFFFFB728;
     /** Label colour of an inactive tab with unread messages. */
     public int unreadText = 0xFFFFFF55;
+
+    /**
+     * How the bar size reacts to the window: with chat's scale, with its height, with GUI Scale, or not at all. The
+     * last three are Shopping List's HUD sizing.
+     */
+    public enum Sizing { CHAT, WINDOW, GUI_SCALE, FIXED }
+
+    // Size: percent of the size Sizing gives.
+    public int hudScale = 100;
+    public Sizing sizing = Sizing.CHAT;
 
     // Sizes (GUI pixels).
     public int tabHeight = 12;
@@ -94,7 +105,24 @@ public final class TabStyle {
         gap = Math.clamp(gap, 0, 8);
         borderWidth = Math.clamp(borderWidth, 0, 3);
         radius = Math.clamp(radius, 0, 6);
+        hudScale = Math.clamp(hudScale, 50, 300);
+        if (sizing == null) sizing = Sizing.CHAT;
         if (font == null || Identifier.tryParse(font) == null) font = DEFAULT_FONT;
+    }
+
+    /**
+     * Bar pixels -> GUI pixels. Chat: chat's scale on screen ({@code chatScale}). Window size: 100% is the original
+     * size in a 1080p window and grows and shrinks with the window height. GUI Scale: follows Minecraft's GUI Scale.
+     * Fixed: same size on screen always. As Shopping List's {@code SandboxWidget.scaleFactor}.
+     */
+    public float scaleFactor(float chatScale) {
+        float scale = hudScale / 100f;
+        if (sizing == Sizing.CHAT) return scale * chatScale;
+        if (sizing == Sizing.GUI_SCALE) return scale;
+        Window window = Minecraft.getInstance().getWindow();
+        int guiScale = Math.max(1, window.getGuiScale());
+        if (sizing == Sizing.FIXED) return scale * 2f / guiScale;
+        return scale * 2f * (window.getScreenHeight() / 1080f) / guiScale;
     }
 
     /** Text in the chosen font and colour. Unknown font ids fall back to Minecraft's default font. */

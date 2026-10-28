@@ -36,7 +36,10 @@ command yourself.
 
 ## Tab bar position
 The tab bar sticks to the chat window, also when a mod such as [Huddable](https://modrinth.com/mod/huddable)
-moves or scales the chat, and grows or shrinks with it (vanilla Chat Scale, Huddable's chat scale and sizing). Pick where in Settings > General > Tab bar:
+moves or scales the chat, and grows or shrinks with it (vanilla Chat Scale, Huddable's chat scale and sizing).
+Settings > Appearance > Scale makes it smaller or bigger (Tab bar scale, 50 to 300%), or sizes it like Skyblock
+Shopping List's HUD instead of matching chat (Tab bar sizing: Window size, Minecraft GUI Scale or Fixed pixels).
+Pick where in Settings > General > Tab bar:
 
 - **Bottom** (default): under the chat, above the input box. Steps aside while you type a command.
 - **Top:** above the chat.
@@ -61,7 +64,8 @@ A tab you aren't looking at shows how many new messages it has, e.g. `Guild (3)`
   position and lock.
 - **Tabs:** one section per tab: name, which channels it shows, where typing sends, move left or right, delete.
   Add tab and Reset tabs at the bottom. These buttons save at once, along with anything else you changed.
-- **Appearance:** colours (background, border and text for normal, hovered, open and unread tabs), tab height,
+- **Appearance:** colours (background, border and text for normal, hovered, open and unread tabs), tab bar scale
+  and sizing, tab height,
   padding, gap, border width, corner radius, font (any font from your resource packs), text shadow and bold open
   tab. The defaults are Skyblock Shopping List's look. A preview above each option's description shows example
   tabs (normal, open, unread and hovered) with your unsaved changes.
