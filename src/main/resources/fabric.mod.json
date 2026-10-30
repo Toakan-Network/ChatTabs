@@ -8,6 +8,11 @@
 		"Tad"
 	],
 	"license": "GPL-3.0-only",
+	"contact": {
+		"homepage": "https://github.com/Toakan-Network/ChatTabs",
+		"sources": "https://github.com/Toakan-Network/ChatTabs",
+		"issues": "https://github.com/Toakan-Network/ChatTabs/issues"
+	},
 	"environment": "client",
 	"entrypoints": {
 		"client": [

@@ -80,3 +80,6 @@ code.
 ## Hypixel rules
 Read-only apart from what you type: a message typed in a channel tab is sent as one command (`/gc hi`), only when
 you press Enter. Nothing is sent when you click a tab.
+
+## License
+GPL-3.0-only (see `LICENSE` and `NOTICE`).
